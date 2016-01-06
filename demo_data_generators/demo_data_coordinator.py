@@ -1,9 +1,10 @@
-from xml.etree.ElementTree import dump
+from xml.etree.ElementTree import tostring
 from demo_data_generators.patients import PatientsGenerator
 from demo_data_generators.spells import SpellsGenerator
 from demo_data_generators.admissions import AdmissionsGenerator
 from demo_data_generators.placements import PlacementsGenerator
 import re
+import os
 
 
 class DemoDataCoordinator(object):
@@ -37,21 +38,23 @@ class DemoDataCoordinator(object):
             admissions = AdmissionsGenerator(patients)
             placements = PlacementsGenerator(patients)
             # Pretty Print the XML file
-            self.indent(patients)
-            self.indent(spells)
-            self.indent(admissions)
-            self.indent(placements)
+            self.indent(patients.root)
+            self.indent(spells.root)
+            self.indent(admissions.root)
+            self.indent(placements.root)
 
+            if not os.path.isdir('ward_{0}'.format(ward)):
+                os.mkdir('ward_{0}'.format(ward))
             with open('ward_{0}/demo_patients.xml'.format(ward), 'wb') as axml:
-                axml.write(dump(patients.root))
+                axml.write(tostring(patients.root))
             with open('ward_{0}/demo_spells.xml'.format(ward), 'wb') as bxml:
-                bxml.write(dump(spells.root))
+                bxml.write(tostring(spells.root))
             with open('ward_{0}/demo_admissions.xml'.format(ward), 'wb') as \
                     cxml:
-                cxml.write(dump(admissions.root))
+                cxml.write(tostring(admissions.root))
             with open('ward_{0}/demo_placements.xml'.format(ward), 'wb') as \
                     dxml:
-                dxml.write(dump(placements.root))
+                dxml.write(tostring(placements.root))
 
     def indent(self, elem, level=0):
         i = "\n" + level*"  "
@@ -67,3 +70,5 @@ class DemoDataCoordinator(object):
         else:
             if level and (not elem.tail or not elem.tail.strip()):
                 elem.tail = i
+
+DemoDataCoordinator('a', 1, 0)

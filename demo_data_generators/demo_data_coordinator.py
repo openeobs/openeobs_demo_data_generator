@@ -28,10 +28,10 @@ class DemoDataCoordinator(object):
 
         for index, ward in enumerate(wards):
             patients = PatientsGenerator(
-                    (index * total_patients_per_ward) + patient_id_offset,
-                    bed_patient_per_ward,
-                    non_bed_patient_per_ward,
-                    ward
+                (index * total_patients_per_ward) + patient_id_offset,
+                bed_patient_per_ward,
+                non_bed_patient_per_ward,
+                ward
             )
             spells = SpellsGenerator(patients)
             admissions = AdmissionsGenerator(patients)
@@ -41,7 +41,7 @@ class DemoDataCoordinator(object):
             self.indent(spells)
             self.indent(admissions)
             self.indent(placements)
-            
+
             with open('ward_{0}/demo_patients.xml'.format(ward), 'wb') as axml:
                 axml.write(dump(patients.root))
             with open('ward_{0}/demo_spells.xml'.format(ward), 'wb') as bxml:

@@ -10,5 +10,4 @@ script:
 - flake8 demo_data_generators
 # Run analysis on code base
 after_script:
-- coverage -m
 - pylint demo_data_generators

@@ -1,2 +1,2 @@
 [report]
-source = demo_data_generators/*
+include = demo_data_generators/*

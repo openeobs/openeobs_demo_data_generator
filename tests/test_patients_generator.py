@@ -1,5 +1,5 @@
-from demo_data_generators.patients import PatientsGenerator
 import unittest
+from demo_data_generators.patients import PatientsGenerator
 
 
 class TestPatientsGenerator(unittest.TestCase):
@@ -7,7 +7,7 @@ class TestPatientsGenerator(unittest.TestCase):
     Test that the patients generator does indeed generate patients
     """
 
-    def test_01_has_ethnicity_list(self):
+    def test_has_ethnicity_list(self):
         """
         PatientGenerator has an ethnicity list property, make sure it def does
         """

@@ -3,7 +3,7 @@ from datetime import datetime
 from demo_data_generators.patients import PatientsGenerator
 
 
-class TestInBedPatientOutput(unittest.TestCase):
+class TestPatientsGeneratorOutput(unittest.TestCase):
     """
     Test that the patients generator does indeed generate patients
     """

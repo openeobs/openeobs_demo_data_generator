@@ -54,7 +54,6 @@ class Generate_Admission_Data(object):
         ward_location = re.match(self.ward_regex, bed_string)
         return ward_location.groups()[0]
 
-
     def generate_admit_movement_data(self, patient_id, patient, admit_offset):
         # Generate Admit Movement Data
         self.data.append(
@@ -85,7 +84,6 @@ class Generate_Admission_Data(object):
         self.create_admission_record(patient_id, patient, admit_offset)
         self.update_activity_admission(patient_id)
 
-
     def admit_patients(self):
         """
         Read the patients in the document and admit them to the locations they
@@ -97,21 +95,10 @@ class Generate_Admission_Data(object):
                                         patient.attrib['id'])
             patient_id = patient_id_match.groups()[0]
             admit_offset = random.choice(self.admit_offset_list)
-
-            # self.generate_spell_data(patient_id, patient, admit_offset)
             self.generate_adt_admit_data(patient_id, patient, admit_offset)
             self.generate_admission_data(patient_id, patient, admit_offset)
             self.generate_admit_movement_data(patient_id, patient,
-                                               admit_offset)
-
-            # Generate placement data
-           # location_el = patient.find('field[@name=\'current_location_id\']')
-            #location = location_el.attrib['ref']
-            #if '_b' in location[-6:]:
-              #  self.generate_placement_data(patient_id, patient, admit_offset)
-              #  self.generate_placement_movement_data(patient_id, patient,
-              #                                        admit_offset)
-
+                                              admit_offset)
 
     def create_activity_admit_movement_record(self, patient_id, patient,
                                               admit_offset):
@@ -593,8 +580,6 @@ class Generate_Admission_Data(object):
             }
         )
 
-
-
-wards = ['a']
-for ward in wards:
-    Generate_Admission_Data(ward)
+# wards = ['a']
+# for ward in wards:
+#     Generate_Admission_Data(ward)

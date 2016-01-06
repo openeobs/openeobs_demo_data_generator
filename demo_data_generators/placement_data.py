@@ -54,7 +54,6 @@ class Generate_Placement_Data(object):
         ward_location = re.match(self.ward_regex, bed_string)
         return ward_location.groups()[0]
 
-
     def generate_placement_data(self, patient_id, patient, admit_offset):
         self.data.append(
             Comment(
@@ -103,8 +102,6 @@ class Generate_Placement_Data(object):
                 self.generate_placement_data(patient_id, patient, admit_offset)
                 self.generate_placement_movement_data(patient_id, patient,
                                                       admit_offset)
-
-
 
     def create_activity_placement_record(self, patient_id, patient,
                                          admit_offset):

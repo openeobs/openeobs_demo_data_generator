@@ -50,7 +50,6 @@ class Generate_Spell_Data(object):
             if level and (not elem.tail or not elem.tail.strip()):
                 elem.tail = i
 
-
     def generate_spell_data(self, patient_id, patient, admit_offset):
         # Generate Spell data
         self.data.append(
@@ -60,7 +59,6 @@ class Generate_Spell_Data(object):
                                           admit_offset)
         self.create_spell_record(patient_id, patient, admit_offset)
         self.update_activity_spell(patient_id)
-
 
     def admit_patients(self):
         """
@@ -75,18 +73,6 @@ class Generate_Spell_Data(object):
             admit_offset = random.choice(self.admit_offset_list)
 
             self.generate_spell_data(patient_id, patient, admit_offset)
-            # self.generate_adt_admit_data(patient_id, patient, admit_offset)
-            # self.generate_admission_data(patient_id, patient, admit_offset)
-            # self.generate_admit_movement_data(patient_id, patient,
-            #                                   admit_offset)
-
-            # Generate placement data
-            #location_el = patient.find('field[@name=\'current_location_id\']')
-            #location = location_el.attrib['ref']
-            #if '_b' in location[-6:]:
-            #    self.generate_placement_data(patient_id, patient, admit_offset)
-            #    self.generate_placement_movement_data(patient_id, patient,
-            #                                          admit_offset)
 
     def create_activity_spell_record(self, patient_id, patient, admit_offset):
         # Create nh.activity ADT admission record with id

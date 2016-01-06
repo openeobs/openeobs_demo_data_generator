@@ -1,11 +1,11 @@
-from xml.etree.ElementTree import Element, SubElement, Comment, dump, parse
+from xml.etree.ElementTree import Element, SubElement, Comment
 import random
 import re
 
 
-class Generate_Placement_Data(object):
+class PlacementsGenerator(object):
 
-    def __init__(self, ward_file):
+    def __init__(self, patients):
 
         # Create root element
         self.root = Element('openerp')
@@ -14,8 +14,8 @@ class Generate_Placement_Data(object):
         self.data = SubElement(self.root, 'data', {'noupdate': '1'})
 
         # Read the patient XML file
-        patient_data = parse('ward_{0}/demo_patients.xml'.format(ward_file))
-        self.demo_patients = patient_data.findall('data')[0].findall('record')
+        patient_data = patients.data
+        self.demo_patients = patient_data.findall('record')
 
         # List of time periods to randomly offset admissions
         self.admit_offset_list = ['-1', '-2']
@@ -30,25 +30,6 @@ class Generate_Placement_Data(object):
 
         # Generate the patient admissions
         self.admit_patients()
-
-        # Pretty Print the XML file
-        self.indent(self.root)
-        dump(self.root)
-
-    def indent(self, elem, level=0):
-        i = "\n" + level*"  "
-        if len(elem):
-            if not elem.text or not elem.text.strip():
-                elem.text = i + "  "
-            if not elem.tail or not elem.tail.strip():
-                elem.tail = i
-            for elem in elem:
-                self.indent(elem, level+1)
-            if not elem.tail or not elem.tail.strip():
-                elem.tail = i
-        else:
-            if level and (not elem.tail or not elem.tail.strip()):
-                elem.tail = i
 
     def remove_bed(self, bed_string):
         ward_location = re.match(self.ward_regex, bed_string)
@@ -73,8 +54,7 @@ class Generate_Placement_Data(object):
         )
         self.create_activity_placement_movement_record(patient_id, patient,
                                                        admit_offset)
-        self.create_placement_movement_record(patient_id, patient,
-                                              admit_offset)
+        self.create_placement_movement_record(patient_id, patient)
         self.update_activity_placement_movement(patient_id)
 
     def admit_patients(self):
@@ -88,13 +68,6 @@ class Generate_Placement_Data(object):
                                         patient.attrib['id'])
             patient_id = patient_id_match.groups()[0]
             admit_offset = random.choice(self.admit_offset_list)
-
-            # self.generate_spell_data(patient_id, patient, admit_offset)
-            # self.generate_adt_admit_data(patient_id, patient, admit_offset)
-            # self.generate_admission_data(patient_id, patient, admit_offset)
-            # self.generate_admit_movement_data(patient_id, patient,
-            #                                   admit_offset)
-
             # Generate placement data
             location_el = patient.find('field[@name=\'current_location_id\']')
             location = location_el.attrib['ref']
@@ -349,8 +322,7 @@ class Generate_Placement_Data(object):
             }
         )
 
-    def create_placement_movement_record(self, patient_id, patient,
-                                         admit_offset):
+    def create_placement_movement_record(self, patient_id, patient):
         activity_admit_record = SubElement(
             self.data,
             'record',
@@ -423,8 +395,3 @@ class Generate_Placement_Data(object):
                 'eval': eval_string.format(patient_id)
             }
         )
-
-
-wards = ['a']
-for ward in wards:
-    Generate_Placement_Data(ward)

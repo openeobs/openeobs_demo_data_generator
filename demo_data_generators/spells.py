@@ -24,9 +24,7 @@ class SpellsGenerator(object):
 
         # Regex to use to get the ID for a patient from id attribute on record
         patient_id_regex_string = r'nhc_demo_patient_(\d+)'
-        ward_regex_string = r'(nhc_def_conf_location_w\w)'
         self.patient_id_regex = re.compile(patient_id_regex_string)
-        self.ward_regex = re.compile(ward_regex_string)
 
         # Generate the patient admissions
         self.admit_patients()

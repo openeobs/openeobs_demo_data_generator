@@ -1,11 +1,11 @@
-from xml.etree.ElementTree import Element, SubElement, Comment, dump, parse
+from xml.etree.ElementTree import Element, SubElement, Comment
 import random
 import re
 
 
-class Generate_Admission_Data(object):
+class AdmissionsGenerator(object):
 
-    def __init__(self, ward_file):
+    def __init__(self, patients):
 
         # Create root element
         self.root = Element('openerp')
@@ -14,8 +14,8 @@ class Generate_Admission_Data(object):
         self.data = SubElement(self.root, 'data', {'noupdate': '1'})
 
         # Read the patient XML file
-        patient_data = parse('ward_{0}/demo_patients.xml'.format(ward_file))
-        self.demo_patients = patient_data.findall('data')[0].findall('record')
+        patient_data = patients.data
+        self.demo_patients = patient_data.findall('record')
 
         # List of time periods to randomly offset admissions
         self.admit_offset_list = ['-1', '-2']
@@ -30,25 +30,6 @@ class Generate_Admission_Data(object):
 
         # Generate the patient admissions
         self.admit_patients()
-
-        # Pretty Print the XML file
-        self.indent(self.root)
-        dump(self.root)
-
-    def indent(self, elem, level=0):
-        i = "\n" + level*"  "
-        if len(elem):
-            if not elem.text or not elem.text.strip():
-                elem.text = i + "  "
-            if not elem.tail or not elem.tail.strip():
-                elem.tail = i
-            for elem in elem:
-                self.indent(elem, level+1)
-            if not elem.tail or not elem.tail.strip():
-                elem.tail = i
-        else:
-            if level and (not elem.tail or not elem.tail.strip()):
-                elem.tail = i
 
     def remove_bed(self, bed_string):
         ward_location = re.match(self.ward_regex, bed_string)

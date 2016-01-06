@@ -3,7 +3,7 @@
 Generate Fake Patients based on the locations created
 """
 from faker import Factory
-from xml.etree.ElementTree import Element, SubElement, dump
+from xml.etree.ElementTree import Element, SubElement
 import random
 
 
@@ -38,29 +38,6 @@ class PatientsGenerator(object):
         self.generate_patients(patient_id_offset=non_bed_patient_offset,
                                total_patients=patients_out_bed, in_bed=False,
                                ward=ward)
-        # Pretty Print the XML file
-        self.indent(self.root)
-        dump(self.root)
-
-    def indent(self, elem, level=0):
-        """
-        Indent the output from the XML recursively
-        :param elem: the element in question
-        :param level: the level of indentation
-        """
-        i = "\n" + level*"  "
-        if len(elem):
-            if not elem.text or not elem.text.strip():
-                elem.text = i + "  "
-            if not elem.tail or not elem.tail.strip():
-                elem.tail = i
-            for elem in elem:
-                self.indent(elem, level+1)
-            if not elem.tail or not elem.tail.strip():
-                elem.tail = i
-        else:
-            if level and (not elem.tail or not elem.tail.strip()):
-                elem.tail = i
 
     def generate_patients(self, patient_id_offset=0, total_patients=28,
                           in_bed=True, ward='a'):

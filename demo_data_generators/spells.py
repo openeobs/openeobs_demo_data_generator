@@ -1,4 +1,4 @@
-from xml.etree.ElementTree import Element, SubElement, Comment, dump
+from xml.etree.ElementTree import Element, SubElement, Comment
 import random
 import re
 
@@ -30,25 +30,6 @@ class SpellsGenerator(object):
 
         # Generate the patient admissions
         self.admit_patients()
-
-        # Pretty Print the XML file
-        self.indent(self.root)
-        dump(self.root)
-
-    def indent(self, elem, level=0):
-        i = "\n" + level*"  "
-        if len(elem):
-            if not elem.text or not elem.text.strip():
-                elem.text = i + "  "
-            if not elem.tail or not elem.tail.strip():
-                elem.tail = i
-            for elem in elem:
-                self.indent(elem, level+1)
-            if not elem.tail or not elem.tail.strip():
-                elem.tail = i
-        else:
-            if level and (not elem.tail or not elem.tail.strip()):
-                elem.tail = i
 
     def generate_spell_data(self, patient_id, patient, admit_offset):
         # Generate Spell data

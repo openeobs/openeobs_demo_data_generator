@@ -1,9 +1,16 @@
+# pylint: disable=too-many-locals
+"""
+Generate Fake Patients based on the locations created
+"""
 from faker import Factory
 from xml.etree.ElementTree import Element, SubElement, dump
 import random
 
 
 class PatientsGenerator(object):
+    """
+    Generate Patients
+    """
 
     def __init__(self, patient_id_offset, patients_in_bed, patients_out_bed,
                  ward):
@@ -36,6 +43,11 @@ class PatientsGenerator(object):
         dump(self.root)
 
     def indent(self, elem, level=0):
+        """
+        Indent the output from the XML recursively
+        :param elem: the element in question
+        :param level: the level of indentation
+        """
         i = "\n" + level*"  "
         if len(elem):
             if not elem.text or not elem.text.strip():

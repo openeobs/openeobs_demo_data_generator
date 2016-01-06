@@ -1,5 +1,3 @@
-import os
-
 from faker import Factory
 from faker.providers.person.en import Provider
 from xml.etree.ElementTree import (Element, SubElement, dump, Comment,

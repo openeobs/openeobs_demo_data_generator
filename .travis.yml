@@ -9,5 +9,5 @@ script: nosetests --with-coverage
 # Run analysis on code base
 after_script:
 - coverage -m
-- pylint
-- flake8
+- pylint demo_data_generators
+- flake8 demo_data_generators

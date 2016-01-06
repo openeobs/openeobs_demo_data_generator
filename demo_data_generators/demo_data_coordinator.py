@@ -70,5 +70,3 @@ class DemoDataCoordinator(object):
         else:
             if level and (not elem.tail or not elem.tail.strip()):
                 elem.tail = i
-
-DemoDataCoordinator('a', 1, 0)

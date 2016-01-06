@@ -3,7 +3,7 @@ from xml.etree.ElementTree import Element, SubElement, dump
 import random
 
 
-class PatientGenerator(object):
+class PatientsGenerator(object):
 
     def __init__(self, patient_id_offset, patients_in_bed, patients_out_bed,
                  ward):
@@ -136,11 +136,11 @@ class PatientGenerator(object):
                 }
             )
 
-wards = ['a', 'b', 'c', 'd', 'e']
-bed_patients_per_ward = 28
-non_bed_patients_per_ward = 12
-total_patients_per_ward = bed_patients_per_ward + non_bed_patients_per_ward
-patient_id_offset = 1
-for index, ward in enumerate(wards):
-    PatientGenerator((index * total_patients_per_ward) + patient_id_offset,
-                     bed_patients_per_ward, non_bed_patients_per_ward, ward)
+# wards = ['a', 'b', 'c', 'd', 'e']
+# bed_patients_per_ward = 28
+# non_bed_patients_per_ward = 12
+# total_patients_per_ward = bed_patients_per_ward + non_bed_patients_per_ward
+# patient_id_offset = 1
+# for index, ward in enumerate(wards):
+#     PatientsGenerator((index * total_patients_per_ward) + patient_id_offset,
+#                      bed_patients_per_ward, non_bed_patients_per_ward, ward)

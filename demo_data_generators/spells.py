@@ -1,4 +1,4 @@
-from xml.etree.ElementTree import Element, SubElement, Comment, dump, parse
+from xml.etree.ElementTree import Element, SubElement, Comment, dump
 import random
 import re
 

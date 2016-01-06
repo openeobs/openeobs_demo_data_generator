@@ -3,9 +3,9 @@ import random
 import re
 
 
-class Generate_Spell_Data(object):
+class SpellsGenerator(object):
 
-    def __init__(self, ward_file):
+    def __init__(self, patients):
 
         # Create root element
         self.root = Element('openerp')
@@ -14,8 +14,8 @@ class Generate_Spell_Data(object):
         self.data = SubElement(self.root, 'data', {'noupdate': '1'})
 
         # Read the patient XML file
-        patient_data = parse('ward_{0}/demo_patients.xml'.format(ward_file))
-        self.demo_patients = patient_data.findall('data')[0].findall('record')
+        patient_data = patients.data
+        self.demo_patients = patient_data.findall('record')
 
         # List of time periods to randomly offset admissions
         self.admit_offset_list = ['-1', '-2']
@@ -23,8 +23,8 @@ class Generate_Spell_Data(object):
                                       '.strftime(\'%Y-%m-%d 00:00:00\')'
 
         # Regex to use to get the ID for a patient from id attribute on record
-        patient_id_regex_string = 'nhc_demo_patient_(\d+)'
-        ward_regex_string = '(nhc_def_conf_location_w\w)'
+        patient_id_regex_string = r'nhc_demo_patient_(\d+)'
+        ward_regex_string = r'(nhc_def_conf_location_w\w)'
         self.patient_id_regex = re.compile(patient_id_regex_string)
         self.ward_regex = re.compile(ward_regex_string)
 
@@ -219,6 +219,6 @@ class Generate_Spell_Data(object):
             }
         )
 
-wards = ['a']
-for ward in wards:
-    Generate_Spell_Data(ward)
+# wards = ['a']
+# for ward in wards:
+#     Generate_Spell_Data(ward)

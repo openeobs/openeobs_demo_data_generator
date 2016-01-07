@@ -23,9 +23,11 @@ def read_data(client):
     records = client.read('nh.clinical.location', [('usage', '=', 'ward')])
     for record in records:
 
+        #Print name of ward and number of patients in each ward
         print(record['name'])
         print('Patients: {patients}'.format(patients=len(record['patient_ids'])))
 
+        #Print number of beds in each ward
         beds = client.read('nh.clinical.location', [('usage', '=', 'bed')])
         bed_list = []
         for bed in beds:
@@ -33,12 +35,14 @@ def read_data(client):
                 bed_list.append(bed)
         print('Beds: {beds}'.format(beds=len(bed_list)))
 
+        #Print number of nurses in each ward
         nurse_list = []
         for nurse_id in record['assigned_nurse_ids']:
             nurse_name = client.read('res.users', [('id', '=', nurse_id)],'display_name')
             nurse_list.append(nurse_name)
         print('Nurses: {nurses}'.format(nurses=len(nurse_list)))
 
+        #Print number of doctors in each ward
         doctor_list = []
         for doctor_id in record['assigned_doctor_ids']:
             doctor_name = client.read('res.users', [('id', '=', doctor_id)],'display_name')

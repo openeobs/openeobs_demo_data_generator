@@ -18,7 +18,7 @@ class LocationsGenerator(object):
         self.data = SubElement(self.root, 'data', {'noupdate': '1'})
 
         self.generate_location(ward_name, 'Ward {0}'.format(ward_name.upper()),
-                               'ward', 'guh', ward_name)
+                               'ward', 'guh', ward_name, 0)
         self.generate_beds(beds_per_ward, ward_name)
 
     def generate_beds(self, number_of_beds, ward_name):
@@ -31,9 +31,9 @@ class LocationsGenerator(object):
             bed_id = item + 1
             self.generate_location('{0}_b{1}'.format(ward_name, bed_id),
                                    'Bed {0}'.format(bed_id), 'bed',
-                                   'w{0}'.format(ward_name), ward_name)
+                                   'w{0}'.format(ward_name), ward_name, bed_id)
 
-    def generate_location(self, id, name, usage, parent, ward):
+    def generate_location(self, id, name, usage, parent, ward, bed_number):
             # Create record with id and patient model
             record = SubElement(
                 self.data,
@@ -53,7 +53,7 @@ class LocationsGenerator(object):
             if usage == 'ward':
                 code_field.text = ward.upper()
             elif usage == 'bed':
-                code_field.text = '{0}{1}'.format(ward.upper(), id)
+                code_field.text = '{0}{1}'.format(ward.upper(), bed_number)
             else:
                 code_field.text = id.upper().replace('_', '')
 

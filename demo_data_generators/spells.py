@@ -1,10 +1,11 @@
+"""Generates spells"""
 from xml.etree.ElementTree import Element, SubElement, Comment
 import random
 import re
 
 
 class SpellsGenerator(object):
-
+    """Generates spells"""
     def __init__(self, patients):
 
         # Create root element
@@ -30,7 +31,7 @@ class SpellsGenerator(object):
         self.admit_patients()
 
     def generate_spell_data(self, patient_id, patient, admit_offset):
-        # Generate Spell data
+        """Generate Spell data"""
         self.data.append(
             Comment('Spell data for patient {0}'.format(patient_id))
         )
@@ -54,6 +55,8 @@ class SpellsGenerator(object):
             self.generate_spell_data(patient_id, patient, admit_offset)
 
     def create_activity_spell_record(self, patient_id, patient, admit_offset):
+        """Creates activity spell record"""
+
         # Create nh.activity ADT admission record with id
         activity_admit_record = SubElement(
             self.data,
@@ -107,6 +110,8 @@ class SpellsGenerator(object):
         )
 
     def create_spell_record(self, patient_id, patient, admit_offset):
+        """Creates spell record"""
+
         # Create nh.clinical.adt.patient.admit record with id & data
         activity_admit_record = SubElement(
             self.data,
@@ -176,6 +181,8 @@ class SpellsGenerator(object):
         )
 
     def update_activity_spell(self, patient_id):
+        """Update activity spell"""
+
         # Create nh.clinical.adt.patient.admit record with id & data
         update_activity_admit_record = SubElement(
             self.data,

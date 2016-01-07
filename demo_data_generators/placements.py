@@ -1,10 +1,12 @@
+# pylint: disable=C0103
+"""Generates placements"""
 from xml.etree.ElementTree import Element, SubElement, Comment
 import random
 import re
 
 
 class PlacementsGenerator(object):
-
+    """Generates placements"""
     def __init__(self, patients):
 
         # Create root element
@@ -23,8 +25,8 @@ class PlacementsGenerator(object):
                                       '.strftime(\'%Y-%m-%d 00:00:00\')'
 
         # Regex to use to get the ID for a patient from id attribute on record
-        patient_id_regex_string = 'nhc_demo_patient_(\d+)'
-        ward_regex_string = '(nhc_def_conf_location_w\w)'
+        patient_id_regex_string = r'nhc_demo_patient_(\d+)'
+        ward_regex_string = r'(nhc_def_conf_location_w\w)'
         self.patient_id_regex = re.compile(patient_id_regex_string)
         self.ward_regex = re.compile(ward_regex_string)
 
@@ -32,10 +34,12 @@ class PlacementsGenerator(object):
         self.admit_patients()
 
     def remove_bed(self, bed_string):
+        """Removes a bed"""
         ward_location = re.match(self.ward_regex, bed_string)
         return ward_location.groups()[0]
 
     def generate_placement_data(self, patient_id, patient, admit_offset):
+        """Generate placement data"""
         self.data.append(
             Comment(
                 'Placement data for patient {0}'.format(patient_id)
@@ -48,7 +52,7 @@ class PlacementsGenerator(object):
 
     def generate_placement_movement_data(self, patient_id, patient,
                                          admit_offset):
-        # Generate Spell Movement Data
+        """Generate Spell Movement Data"""
         self.data.append(
             Comment('Spell movement for patient {0}'.format(patient_id))
         )
@@ -78,7 +82,9 @@ class PlacementsGenerator(object):
 
     def create_activity_placement_record(self, patient_id, patient,
                                          admit_offset):
-        # Create nh.activity ADT admission record with id
+        """Create activity placement record"""
+
+        #Create nh.activity ADT admission record with id
         activity_admit_record = SubElement(
             self.data,
             'record',
@@ -163,6 +169,8 @@ class PlacementsGenerator(object):
         )
 
     def create_placement_record(self, patient_id, patient):
+        """Create placement record"""
+
         # Create nh.clinical.adt.patient.admit record with id & data
         activity_admit_record = SubElement(
             self.data,
@@ -216,6 +224,8 @@ class PlacementsGenerator(object):
         )
 
     def update_activity_placement(self, patient_id):
+        """Update activity placement"""
+
         # Create nh.clinical.adt.patient.admit record with id & data
         update_activity_admit_record = SubElement(
             self.data,
@@ -240,6 +250,7 @@ class PlacementsGenerator(object):
 
     def create_activity_placement_movement_record(self, patient_id, patient,
                                                   admit_offset):
+        """Create activity placement movement record"""
         activity_admit_record = SubElement(
             self.data,
             'record',
@@ -323,6 +334,7 @@ class PlacementsGenerator(object):
         )
 
     def create_placement_movement_record(self, patient_id, patient):
+        """Create placement movement record"""
         activity_admit_record = SubElement(
             self.data,
             'record',
@@ -338,8 +350,7 @@ class PlacementsGenerator(object):
             'field',
             {
                 'name': 'activity_id',
-                'ref': 'nhc_activity_demo_placement_move_{0}'.format(
-                        patient_id)
+                'ref': 'nhc_activity_demo_placement_move_{0}'.format(patient_id)
             }
         )
 
@@ -374,6 +385,8 @@ class PlacementsGenerator(object):
         )
 
     def update_activity_placement_movement(self, patient_id):
+        """Update activity placement movement"""
+
         # Create nh.clinical.adt.patient.admit record with id & data
         update_activity_admit_record = SubElement(
             self.data,

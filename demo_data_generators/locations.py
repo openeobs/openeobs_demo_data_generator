@@ -1,3 +1,6 @@
+# pylint: disable=W0622
+# pylint: disable=C0103
+# pylint: disable=R0913
 """
 Generate Ward and defined number of beds
 """
@@ -34,39 +37,40 @@ class LocationsGenerator(object):
                                    'w{0}'.format(ward_name), ward_name)
 
     def generate_location(self, id, name, usage, parent, ward):
-            # Create record with id and patient model
-            record = SubElement(
-                self.data,
-                'record',
-                {
-                    'model': 'nh.clinical.location',
-                    'id': 'nhc_def_conf_location_w{0}'.format(id)
-                }
-            )
+        """Generate a location"""
 
-            # create DOB field with fake data
-            name_field = SubElement(record, 'field', {'name': 'name'})
-            name_field.text = name
+        # Create record with id and patient model
+        record = SubElement(
+            self.data,
+            'record',
+            {
+                'model': 'nh.clinical.location',
+                'id': 'nhc_def_conf_location_w{0}'.format(id)
+            }
+        )
 
-            # Create Gender / Sex fields with fake data
-            code_field = SubElement(record, 'field', {'name': 'code'})
-            if usage == 'ward':
-                code_field.text = ward.upper()
-            elif usage == 'bed':
-                code_field.text = '{0}{1}'.format(ward.upper(), id)
-            else:
-                code_field.text = id.upper().replace('_', '')
+        # create DOB field with fake data
+        name_field = SubElement(record, 'field', {'name': 'name'})
+        name_field.text = name
 
-            type_field = SubElement(record, 'field', {'name': 'type'})
-            type_field.text = 'poc'
+        # Create Gender / Sex fields with fake data
+        code_field = SubElement(record, 'field', {'name': 'code'})
+        if usage == 'ward':
+            code_field.text = ward.upper()
+        elif usage == 'bed':
+            code_field.text = '{0}{1}'.format(ward.upper(), id)
+        else:
+            code_field.text = id.upper().replace('_', '')
 
-            # Create Ethnicity
-            usage_field = SubElement(record, 'field', {'name': 'usage'})
-            usage_field.text = usage
+        type_field = SubElement(record, 'field', {'name': 'type'})
+        type_field.text = 'poc'
 
-            # Create location id
-            SubElement(record, 'field', {
-                'name': 'parent_id',
-                'ref': 'nhc_def_conf_location_{0}'.format(parent)
-                }
-            )
+        # Create Ethnicity
+        usage_field = SubElement(record, 'field', {'name': 'usage'})
+        usage_field.text = usage
+
+        # Create location id
+        SubElement(record, 'field', {
+            'name': 'parent_id',
+            'ref': 'nhc_def_conf_location_{0}'.format(parent)
+            })

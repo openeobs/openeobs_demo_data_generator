@@ -1,3 +1,4 @@
+"""Test that the admissions generator does indeed generate admissions"""
 import unittest
 import re
 from demo_data_generators.admissions import AdmissionsGenerator
@@ -53,7 +54,7 @@ class TestAdmissionsGenerator(unittest.TestCase):
                          'Incorrect regex groups')
         self.assertEqual(ward_groups.groups()[0], 'nhc_def_conf_location_wa',
                          'Incorrect Regex match')
-        
+
     def test_has_patient_id_regex(self):
         """
         Make sure that the patient_id regex is valid

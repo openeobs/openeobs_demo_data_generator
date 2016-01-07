@@ -1,10 +1,12 @@
+# pylint: disable=C0103
+"""Generates admissions"""
 from xml.etree.ElementTree import Element, SubElement, Comment
 import random
 import re
 
 
 class AdmissionsGenerator(object):
-
+    """Generates admissions"""
     def __init__(self, patients):
 
         # Create root element
@@ -23,8 +25,8 @@ class AdmissionsGenerator(object):
                                       '.strftime(\'%Y-%m-%d 00:00:00\')'
 
         # Regex to use to get the ID for a patient from id attribute on record
-        patient_id_regex_string = 'nhc_demo_patient_(\d+)'
-        ward_regex_string = '(nhc_def_conf_location_w\w)'
+        patient_id_regex_string = r'nhc_demo_patient_(\d+)'
+        ward_regex_string = r'(nhc_def_conf_location_w\w)'
         self.patient_id_regex = re.compile(patient_id_regex_string)
         self.ward_regex = re.compile(ward_regex_string)
 
@@ -32,22 +34,22 @@ class AdmissionsGenerator(object):
         self.admit_patients()
 
     def remove_bed(self, bed_string):
+        """Removes a bed"""
+
         ward_location = re.match(self.ward_regex, bed_string)
         return ward_location.groups()[0]
 
     def generate_admit_movement_data(self, patient_id, patient, admit_offset):
-        # Generate Admit Movement Data
+        """Generate Admit Movement Data"""
         self.data.append(
             Comment('Admit movement for patient {0}'.format(patient_id))
         )
-        self.create_activity_admit_movement_record(patient_id, patient,
-                                                   admit_offset)
-        self.create_admit_movement_record(patient_id, patient,
-                                          admit_offset)
+        self.create_activity_admit_movement_record(patient_id, admit_offset)
+        self.create_admit_movement_record(patient_id, patient)
         self.update_activity_admit_movement(patient_id)
 
     def generate_adt_admit_data(self, patient_id, patient, admit_offset):
-        # Generate ADT Admit data
+        """Generate ADT Admit data"""
         self.data.append(
             Comment('ADT Admit data for patient {0}'.format(patient_id))
         )
@@ -56,7 +58,7 @@ class AdmissionsGenerator(object):
         self.update_activity_admit(patient_id)
 
     def generate_admission_data(self, patient_id, patient, admit_offset):
-        # Generate Admission data
+        """Generate Admission data"""
         self.data.append(
             Comment('Actual Admit data for patient {0}'.format(patient_id))
         )
@@ -81,8 +83,8 @@ class AdmissionsGenerator(object):
             self.generate_admit_movement_data(patient_id, patient,
                                               admit_offset)
 
-    def create_activity_admit_movement_record(self, patient_id, patient,
-                                              admit_offset):
+    def create_activity_admit_movement_record(self, patient_id, admit_offset):
+        """Create activity admit movement record"""
         activity_admit_record = SubElement(
             self.data,
             'record',
@@ -153,7 +155,8 @@ class AdmissionsGenerator(object):
             }
         )
 
-    def create_admit_movement_record(self, patient_id, patient, admit_offset):
+    def create_admit_movement_record(self, patient_id, patient):
+        """Create admit movement record"""
         activity_admit_record = SubElement(
             self.data,
             'record',
@@ -196,6 +199,8 @@ class AdmissionsGenerator(object):
         )
 
     def update_activity_admit_movement(self, patient_id):
+        """Update activity admit movement"""
+
         # Create nh.clinical.adt.patient.admit record with id & data
         update_activity_admit_record = SubElement(
             self.data,
@@ -219,6 +224,8 @@ class AdmissionsGenerator(object):
         )
 
     def create_activity_admit_record(self, patient_id, admit_offset):
+        """Create activity admit record"""
+
         # Create nh.activity ADT admit record with id
         activity_admit_record = SubElement(
             self.data,
@@ -272,6 +279,8 @@ class AdmissionsGenerator(object):
         )
 
     def create_admit_record(self, patient_id, patient, admit_offset):
+        """Create admit record"""
+
         # Create nh.clinical.adt.patient.admit record with id & data
         activity_admit_record = SubElement(
             self.data,
@@ -361,6 +370,8 @@ class AdmissionsGenerator(object):
         other_id_field.text = other_identifier
 
     def update_activity_admit(self, patient_id):
+        """Update activity admit"""
+
         # Create nh.clinical.adt.patient.admit record with id & data
         update_activity_admit_record = SubElement(
             self.data,
@@ -385,6 +396,8 @@ class AdmissionsGenerator(object):
 
     def create_activity_admission_record(self, patient_id, patient,
                                          admit_offset):
+        """Create activity admission record"""
+
         # Create nh.activity ADT admission record with id
         activity_admit_record = SubElement(
             self.data,
@@ -470,6 +483,8 @@ class AdmissionsGenerator(object):
         )
 
     def create_admission_record(self, patient_id, patient, admit_offset):
+        """Create admission record"""
+
         # Create nh.clinical.adt.patient.admit record with id & data
         activity_admit_record = SubElement(
             self.data,
@@ -539,6 +554,8 @@ class AdmissionsGenerator(object):
         )
 
     def update_activity_admission(self, patient_id):
+        """Update activity admission"""
+
         # Create nh.clinical.adt.patient.admit record with id & data
         update_activity_admit_record = SubElement(
             self.data,

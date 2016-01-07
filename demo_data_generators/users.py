@@ -1,3 +1,9 @@
+# pylint: disable=F0401
+# pylint: disable=R0201
+# pylint: disable=R0915
+# pylint: disable=W0105
+# pylint: disable=R0914
+"""Generates user XML"""
 from faker import Factory
 from faker.providers.person.en import Provider
 from xml.etree.ElementTree import (Element, SubElement, dump, Comment,
@@ -5,7 +11,7 @@ from xml.etree.ElementTree import (Element, SubElement, dump, Comment,
 
 
 class UsersXMLGenerator(object):
-
+    """Generates user XML"""
     def __init__(self, users_dictionary):
         """
         Initialise variables and generators used for users' data generation.
@@ -97,6 +103,7 @@ class UsersXMLGenerator(object):
                 elem.tail = i
 
     def get_beds_number_generator(self, beds_number):
+        """Generates a bed number"""
         for i in xrange(1, beds_number+1):
             yield i
 
@@ -119,7 +126,7 @@ class UsersXMLGenerator(object):
 
         for role, users_number in self.users_dictionary.iteritems():
             # Initialise some variable to generate data for the current ward
-            total_users, users_per_ward, unassigned = users_number
+            users_per_ward, unassigned = users_number
             beds_per_user = beds_number / users_per_ward
 
             # Initialise the generator for every users' role,
@@ -163,8 +170,7 @@ class UsersXMLGenerator(object):
                 record = SubElement(data, 'record',
                                     {'model': 'res.users',
                                      'id': 'nhc_def_conf_{0}_{1}_user'.format(
-                                         role, first_name.lower())
-                                     })
+                                         role, first_name.lower())})
                 # Create user name field
                 name_field = SubElement(record, 'field', {'name': 'name'})
                 name_field.text = '{0} {1}'.format(first_name, last_name)
@@ -198,8 +204,7 @@ class UsersXMLGenerator(object):
                 record = SubElement(data, 'record',
                                     {'model': 'res.users',
                                      'id': 'nhc_def_conf_{0}_{1}_user'.format(
-                                         role, first_name.lower())
-                                     })
+                                         role, first_name.lower())})
                 # Create user name field
                 name_field = SubElement(record, 'field', {'name': 'name'})
                 name_field.text = '{0} {1}'.format(first_name, last_name)
@@ -239,24 +244,24 @@ class UsersXMLGenerator(object):
             xml_tree.write(xml_file)
 
 """
-# Start the users generation !!!
-wards_list = ['a', 'b', 'c', 'd', 'e']
-beds_per_ward = 30
-users_dictionary = {
-    'hca': (55, 10, 5),
-    'nurse': (55, 10, 5),
-    'ward_manager': (6, 1, 1),
-    'doctor': (24, 4, 1),
-    'kiosk': (5, 1, 0),
-}
-data_folder = os.path.dirname(__file__)
-users_generator = UsersXMLGenerator(users_dictionary)
-for w in wards_list:
-    #ward_folder = 'ward_{}'.format(w)
-    #xml_folder = os.path.join(data_folder, ward_folder)
-    #xml_file = os.path.join(xml_folder, 'demo_users.xml')
-    users_generator.generate_users(
-        w, beds_per_ward, os.path.join(data_folder,
-                                       'ward_{}_users.xml'.format(w))
-    )
+    # Start the users generation !!!
+    wards_list = ['a', 'b', 'c', 'd', 'e']
+    beds_per_ward = 30
+    users_dictionary = {
+        'hca': (55, 10, 5),
+        'nurse': (55, 10, 5),
+        'ward_manager': (6, 1, 1),
+        'doctor': (24, 4, 1),
+        'kiosk': (5, 1, 0),
+    }
+    data_folder = os.path.dirname(__file__)
+    users_generator = UsersXMLGenerator(users_dictionary)
+    for w in wards_list:
+        #ward_folder = 'ward_{}'.format(w)
+        #xml_folder = os.path.join(data_folder, ward_folder)
+        #xml_file = os.path.join(xml_folder, 'demo_users.xml')
+        users_generator.generate_users(
+            w, beds_per_ward, os.path.join(data_folder,
+                                           'ward_{}_users.xml'.format(w))
+        )
 """

@@ -1,3 +1,6 @@
+# pylint: disable=R0903
+# pylint: disable=R0914
+"""Coordinates demo data"""
 from xml.etree.ElementTree import tostring
 from demo_data_generators.patients import PatientsGenerator
 from demo_data_generators.spells import SpellsGenerator
@@ -8,7 +11,7 @@ import os
 
 
 class DemoDataCoordinator(object):
-
+    """Coordinates demo data"""
     def __init__(self, wards, bed_patient_per_ward, non_bed_patient_per_ward):
 
         total_patients_per_ward = \
@@ -57,6 +60,7 @@ class DemoDataCoordinator(object):
                 dxml.write(tostring(placements.root))
 
     def indent(self, elem, level=0):
+        """Indents data"""
         i = "\n" + level*"  "
         if len(elem):
             if not elem.text or not elem.text.strip():

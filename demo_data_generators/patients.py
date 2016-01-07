@@ -1,5 +1,4 @@
 # pylint: disable=too-many-locals
-# pylint: disable=F0401
 # pylint: disable=R0903
 """
 Generate Fake Patients based on the locations created

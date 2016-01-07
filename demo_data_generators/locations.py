@@ -1,5 +1,4 @@
 # pylint: disable=R0913
-# pylint: disable=W0622
 # pylint: disable=C0103
 """
 Generate Ward and defined number of beds
@@ -36,7 +35,7 @@ class LocationsGenerator(object):
                                    'Bed {0}'.format(bed_id), 'bed',
                                    'w{0}'.format(ward_name), ward_name, bed_id)
 
-    def generate_location(self, id, name, usage, parent, ward, bed_number):
+    def generate_location(self, rid, name, usage, parent, ward, bed_number):
         """Generate a location"""
         # Create record with id and patient model
         record = SubElement(
@@ -44,7 +43,7 @@ class LocationsGenerator(object):
             'record',
             {
                 'model': 'nh.clinical.location',
-                'id': 'nhc_def_conf_location_w{0}'.format(id)
+                'id': 'nhc_def_conf_location_w{0}'.format(rid)
             }
         )
 
@@ -59,7 +58,7 @@ class LocationsGenerator(object):
         elif usage == 'bed':
             code_field.text = '{0}{1}'.format(ward.upper(), bed_number)
         else:
-            code_field.text = id.upper().replace('_', '')
+            code_field.text = rid.upper().replace('_', '')
 
         type_field = SubElement(record, 'field', {'name': 'type'})
         type_field.text = 'poc'

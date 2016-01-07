@@ -84,7 +84,7 @@ class PlacementsGenerator(object):
                                          admit_offset):
         """Create activity placement record"""
 
-        #Create nh.activity ADT admission record with id
+        # Create nh.activity ADT admission record with id
         activity_admit_record = SubElement(
             self.data,
             'record',
@@ -345,12 +345,13 @@ class PlacementsGenerator(object):
         )
 
         # Create activity_id reference
+        activity_id_ref = 'nhc_activity_demo_placement_move_{0}'
         SubElement(
             activity_admit_record,
             'field',
             {
                 'name': 'activity_id',
-                'ref': 'nhc_activity_demo_placement_move_{0}'.format(patient_id)
+                'ref': activity_id_ref.format(patient_id)
             }
         )
 

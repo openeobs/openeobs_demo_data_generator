@@ -65,7 +65,7 @@ class LocationsGenerator(object):
             usage_field.text = usage
 
             # Create location id
-            SubElement( record, 'field', {
+            SubElement(record, 'field', {
                 'name': 'parent_id',
                 'ref': 'nhc_def_conf_location_{0}'.format(parent)
                 }

@@ -35,3 +35,11 @@ class TestPatientsGenerator(unittest.TestCase):
         self.assertEqual(len(records), 2, 'Incorrect length of ward record')
         record_usage = records[1].find('field[@name=\'usage\']').text
         self.assertEqual(record_usage, 'bed', 'Incorrect record generated')
+
+    def test_non_bed_non_ward_location_code(self):
+        gen = LocationsGenerator('a', 0)
+        gen.generate_location('a_t1', 'Test', 'test', 'meh', 'a')
+        records = gen.data.findall('record')
+        self.assertEqual(len(records), 2, 'Incorrect length of ward record')
+        record_usage = records[1].find('field[@name=\'code\']').text
+        self.assertEqual(record_usage, 'AT1', 'Incorrect record generated')

@@ -80,6 +80,14 @@ class UsersSmokeTest(unittest.TestCase):
                  self.bed_list.append(bed)
             self.bed_total.append(len(self.bed_list))
 
+        self.list_patients_in_bed = []
+        for ward in self.wards:
+            self.patients_in_bed = 0
+            for bed in self.beds:
+                if ward['name'] in bed['full_name']:
+                    if bed['is_available'] is False:
+                        self.patients_in_bed += 1
+            self.list_patients_in_bed.append(self.patients_in_bed)
 
     def test_hospital_name(self):
         self.assertEqual(self.hospital, 'Greenfield University Hospital',
@@ -108,8 +116,8 @@ class UsersSmokeTest(unittest.TestCase):
                 self.assertEqual(len(list), 10, 'Incorrect number of nurses in ' + ward['name'])
 
     def test_ward_doctors(self):
-        for list in self.doctor_list:
-            self.assertEqual(len(list), 4, 'Incorrect number of doctors')
+        for ward in self.doctor_list:
+            self.assertEqual(len(ward), 4, 'Incorrect number of doctors')
 
     def test_ward_hcas(self):
         for hca in self.hca_list:
@@ -118,6 +126,10 @@ class UsersSmokeTest(unittest.TestCase):
     def test_beds(self):
         for beds in self.bed_total:
             self.assertEqual(beds, 30, 'Incorrect number of beds')
+
+    def test_patients_in_bed(self):
+        for ward in self.list_patients_in_bed:
+            self.assertEqual(ward, 28, 'Incorrect number of patients in bed')
 
 
 

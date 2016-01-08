@@ -125,7 +125,7 @@ class UsersXMLGenerator(object):
         :type first_name_generator: Python generator
         :param groups: group(s) the user belongs to
         :type groups: str
-        :param category: role(s) the user belongs to#
+        :param category: role(s) the user belongs to
         :type category: str
         :param locations: location(s) assigned to the user
         :type locations: str
@@ -159,6 +159,30 @@ class UsersXMLGenerator(object):
         SubElement(record, 'field',
                    {'name': 'location_ids', 'eval': locations})
         # Create pos field
+        SubElement(record, 'field',
+                   {'name': 'pos_id', 'ref': 'nhc_def_conf_pos_hospital'})
+
+    def generate_adt_user(self):
+        record = SubElement(self.class_data, 'record',
+                            {'model': 'res.users',
+                             'id': 'nhc_def_conf_adt_user'})
+        name_field = SubElement(record, 'field', {'name': 'name'})
+        name_field.text = 'GUH-ADT'
+
+        login_field = SubElement(record, 'field', {'name': 'login'})
+        login_field.text = 'adt'
+
+        password_field = SubElement(record, 'field', {'name': 'password'})
+        password_field.text = 'adt'
+
+        SubElement(record, 'field',
+                   {'name': 'groups_id',
+                    'eval': "[(4, ref('nh_clinical.group_nhc_admin'))]"})
+
+        SubElement(record, 'field',
+                   {'name': 'category_id',
+                    'eval': "[(4, ref('nh_clinical.role_nhc_admin'))]"})
+
         SubElement(record, 'field',
                    {'name': 'pos_id', 'ref': 'nhc_def_conf_pos_hospital'})
 

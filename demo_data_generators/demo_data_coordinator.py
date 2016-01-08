@@ -41,6 +41,7 @@ class DemoDataCoordinator(object):
         users_tree.write(os.path.join(data_folder, 'pos.xml'))
 
         users_generator = UsersXMLGenerator(users_schema)
+        users_generator.generate_adt_user()
         users_generator.generate_multi_wards_users(wards)
         users_generator.generate_users_not_assigned()
         self.indent(users_generator.class_root)

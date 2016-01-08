@@ -25,12 +25,21 @@ def get_erppeek_client(server='http://localhost:8069', db='openerp',
 
 class DischargeTransferCoordinator(object):
 
-    def __int__(self, server, database, user, password, discharge_ward,
-                patients, transfer_ward=None):
+    def __init__(self, server, database, user, password):
         client = get_erppeek_client(server=server, db=database, user=user,
                                     password=password)
-        DischargePatients(client, discharge_ward, patients)
-        TransferPatients(client, discharge_ward, transfer_ward, patients)
+
+        TransferPatients(client, 'A', 'B', 4)
+        TransferPatients(client, 'B', 'C', 4)
+        TransferPatients(client, 'C', 'D', 4)
+        TransferPatients(client, 'D', 'E', 4)
+        TransferPatients(client, 'E', 'A', 4)
+
+        DischargePatients(client, 'A', 4)
+        DischargePatients(client, 'B', 4)
+        DischargePatients(client, 'C', 4)
+        DischargePatients(client, 'D', 4)
+        DischargePatients(client, 'E', 4)
 
 
 class DischargePatients(object):

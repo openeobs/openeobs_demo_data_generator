@@ -28,7 +28,7 @@ def get_erppeek_client(server='http://localhost:8069', db='openerp',
 class UsersSmokeTest(unittest.TestCase):
 
     SERVER = 'http://localhost:8069'
-    DATABASE = 'demo_data_master'
+    DATABASE = 'nhclinical'
     USER = 'admin'
     PASSWORD = 'admin'
 
@@ -54,6 +54,14 @@ class UsersSmokeTest(unittest.TestCase):
                                          'NH Clinical Senior Manager Group')],
                                        'users')
         self.senior_managers = len(self.senior_ids[0])
+
+        self.kiosk_ids = self.client.read('res.groups', [('name', '=', 'NH Clinical Kiosk Group')],
+                                       'users')
+        self.kiosks = len(self.kiosk_ids[0])
+        #print(self.kiosk_ids)
+      #  for kiosk in self.kiosk_ids:
+          #  self.kiosks.append(kiosk['users'])
+            #print(self.kiosks)
 
         self.wards = self.client.read('nh.clinical.location',
                                         [('usage', '=', 'ward')])
@@ -136,6 +144,9 @@ class UsersSmokeTest(unittest.TestCase):
     def test_patients_in_bed(self):
         for ward in self.list_patients_in_bed:
             self.assertEqual(ward, 28, 'Incorrect number of patients in bed')
+
+    def test_kiosks(self):
+        self.assertEqual(self.kiosks, 5, 'Incorrect number of kiosks')
 
 
 if __name__ == '__main__':

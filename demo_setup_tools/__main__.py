@@ -27,7 +27,7 @@ def main():
     user = args.user
     password = args.password
     days = args.days
-    ReallocateWardManagers(server, database, 'olga', 'olga')
+    ReallocateWardManagers(server, database, 'oakley', 'oakley')
     SubmitObservations(server, database, user, password, days)
     DischargeTransferCoordinator(server, database, 'adt', 'adt')
 

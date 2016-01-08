@@ -28,7 +28,7 @@ def get_erppeek_client(server='http://localhost:8069', db='openerp',
 class UsersSmokeTest(unittest.TestCase):
 
     SERVER = 'http://localhost:8069'
-    DATABASE = 'nhclinical'
+    DATABASE = 'demo_data_master'
     USER = 'admin'
     PASSWORD = 'admin'
 
@@ -49,9 +49,10 @@ class UsersSmokeTest(unittest.TestCase):
                                          self.hospital_search,
                                          ['name'])['name']
 
-        self.senior_ids = self.client.read('res.partner.category',
-                                       [('name','=','Senior Manager')],
-                                       'child_ids')
+        self.senior_ids = self.client.read('res.groups',
+                                       [('name','=',
+                                         'NH Clinical Senior Manager Group')],
+                                       'users')
         self.senior_managers = len(self.senior_ids[0])
 
         self.wards = self.client.read('nh.clinical.location',

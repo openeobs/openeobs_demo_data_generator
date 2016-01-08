@@ -137,6 +137,5 @@ class UsersSmokeTest(unittest.TestCase):
             self.assertEqual(ward, 28, 'Incorrect number of patients in bed')
 
 
-
 if __name__ == '__main__':
     unittest.main()

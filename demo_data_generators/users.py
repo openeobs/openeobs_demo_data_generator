@@ -1,69 +1,94 @@
 # pylint: disable=R0201
 # pylint: disable=R0915
 # pylint: disable=R0914
-"""Generates user XML"""
+"""
+Generate users, based on locations created and wards assignment schema.
+"""
 from faker import Factory
 from faker.providers.person.en import Provider
-from xml.etree.ElementTree import (Element, SubElement, dump, Comment,
-                                   ElementTree)
+from xml.etree.ElementTree import Element, SubElement, Comment
 
 
 class UsersXMLGenerator(object):
-    """Generates user XML"""
-    def __init__(self, users_dictionary):
+
+    def __init__(self, pos, users_schema):
         """
-        Initialise variables and generators used for users' data generation.
+        Initialise the users XML generator, declaring variables and generators.
 
-        :param users_dictionary: instruction to create an XML tree
-        describing the right number and type of users for each role.
+        Particular attention must be payed to the ``users_schema`` parameter,
+        since it must match the following specification:
+        - every KEY is named after a specific user role in the system
+          (e.g. 'hca', 'nurse', and so forth)
+        - every corresponding VALUE must be a dictionary itself,
+          whose couple key-value must be as following:
+              key: 'total'
+              value: number of users (for a specific role) present in the POS
+              value type: integer
 
-        This dictionary MUST have the following structure:
-            {
-                'hca': (total, assigned, unassigned),
-                'nurse': (total, assigned, unassigned),
-                'ward_manager': (total, assigned, unassigned),
-                'doctor': (total, assigned, unassigned),
-                'kiosk': (total, assigned, unassigned),
-            }
-        each element in the dictionary describes a specific role, where:
-            - the KEYS must match the names of roles in the eObs system,
-            - the VALUES must be tuples of 3 integers:
-                (
-                    number of total users (sum up from all the wards),
-                    number of users assigned to bed(s) or ward locations,
-                    number of users unassigned to any bed(s) or ward locations,
-                )
+              key: 'per_ward'
+              value: number of users (for a specific role) present in each ward
+              value type: integer
 
-        :type users_dictionary: dict
+              key: 'unassigned'
+              value: number of users (for a specific role) not assigned to any
+                     ward
+              type: integer
+
+              key: 'multi_wards'
+              value: structure listing wards code, describing exactly
+                     which wards each user (for a specific role) is assigned to
+                     (this value can also accept the literal string 'all'
+                     to briefly list all the wards present in the POS).
+              value type: tuple of tuples (or string)
+
+        :param pos: reference ID of the POS
+        :type pos: str
+        :param users_schema: complete schema of users' assignment to wards
+        :type users_schema: dict (see the docstring for further details)
         """
-        self.users_dictionary = users_dictionary
+        self.pos = pos
+        self.users_schema = users_schema
+
+        # Create root element
+        self.class_root = Element('openerp')
+        # Create data inside root element
+        self.class_data = SubElement(self.class_root, 'data')
 
         self.data_generator = Factory.create()
 
-        # Timezones
+        # Initialise additional user related data
+        #
+        # timezones
         self.timezone = 'Europe/London'
-
-        # Groups
+        # groups
         self.groups = {
-            'kiosk': 'group_nhc_kiosk',
-            'doctor': 'group_nhc_doctor',
-            'ward_manager': 'group_nhc_ward_manager',
+            'hca': 'group_nhc_hca',
             'nurse': 'group_nhc_nurse',
-            'hca': 'group_nhc_hca'
+            'ward_manager': 'group_nhc_ward_manager',
+            'senior_manager': 'group_nhc_senior_manager',
+            'doctor': 'group_nhc_doctor',
+            'kiosk': 'group_nhc_kiosk',
+            'admin': 'group_nhc_admin'
         }
-
-        # Roles (a.k.a. categories)
+        # roles (a.k.a. categories)
         self.categories = {
-            'kiosk': 'role_nhc_kiosk',
-            'doctor': 'role_nhc_doctor',
-            'ward_manager': 'role_nhc_ward_manager',
+            'hca': 'role_nhc_hca',
             'nurse': 'role_nhc_nurse',
-            'hca': 'role_nhc_hca'
+            'ward_manager': 'role_nhc_ward_manager',
+            'senior_manager': 'role_nhc_senior_manager',
+            'doctor': 'role_nhc_doctor',
+            'kiosk': 'role_nhc_kiosk',
+            'admin': 'role_nhc_admin'
         }
-
-        # Pos
-        self.pos = 'nhc_def_conf_pos_hospital'
-
+        self.assignable_to_ward = (
+            'ward_manager',
+            'doctor',
+            'kiosk',
+        )
+        self.assignable_to_bed = (
+            'hca',
+            'nurse',
+        )
         # First name generators, once per role.
         # Each of them returns only names starting by the initial letter
         # of the role denomination.
@@ -74,169 +99,189 @@ class UsersXMLGenerator(object):
                       if n.lower().startswith('n')),
             'ward_manager': (n for n in Provider.first_names
                              if n.lower().startswith('w')),
+            'senior_manager': (n for n in Provider.first_names
+                               if n.lower().startswith('s')),
             'doctor': (n for n in Provider.first_names
                        if n.lower().startswith('d')),
             'kiosk': (n for n in Provider.first_names
-                      if n.lower().startswith('k'))
+                      if n.lower().startswith('k')),
+            'admin': (n for n in Provider.first_names
+                      if n.lower().startswith('o'))
         }
 
-    def indent(self, elem, level=0):
-        """
-        Pretty format an XML tree.
-
-        It doesn't return anything, because it changes the XML tree in place.
-        """
-        i = '\n' + level * '  '
-        if len(elem):
-            if not elem.text or not elem.text.strip():
-                elem.text = i + "  "
-            if not elem.tail or not elem.tail.strip():
-                elem.tail = i
-            for elem in elem:
-                self.indent(elem, level+1)
-            if not elem.tail or not elem.tail.strip():
-                elem.tail = i
-        else:
-            if level and (not elem.tail or not elem.tail.strip()):
-                elem.tail = i
-
     def get_beds_number_generator(self, beds_number):
-        """Generates a bed number"""
+        """Simple number generator."""
         for i in xrange(1, beds_number+1):
             yield i
 
-    def generate_users(self, ward, beds_number, xml_file=None):
+    def build_user_data(self, xml_parent, role, first_name_generator, groups,
+                        category, locations):
         """
-        Generate an XML structure containing data for all the users,
-        according to the instructions found in the class' users dictionary.
+        Extend the XML tree with elements defining a single user data.
 
-        :param ward: name of the ward (usually a single-letter code, e.g. 'a')
-        :type ward: str
-        :param beds_number: number of beds in the ward
-        :type beds_number: int
-        :param xml_file: path to an existing file to write the XML tree into
-        :type xml_file: str
+        It doesn't return anything because modify the XML tree in place.
+
+        :param xml_parent: XML element to append the user data tree to
+        :param role: role of the user in the POS (e.g. 'hca', 'nurse', etc.)
+        :type role: str
+        :param first_name_generator: generator of name for a specific role
+        :type first_name_generator: Python generator
+        :param groups: group(s) the user belongs to
+        :type groups: str
+        :param category: role(s) the user belongs to#
+        :type category: str
+        :param locations: location(s) assigned to the user
+        :type locations: str
         """
+        first_name = next(first_name_generator)
+        last_name = self.data_generator.last_name()
+        record = SubElement(xml_parent, 'record',
+                            {'model': 'res.users',
+                             'id': 'nhc_def_conf_{0}_{1}_user'.format(
+                                 role, first_name.lower())})
+        # Create user name field
+        name_field = SubElement(record, 'field', {'name': 'name'})
+        name_field.text = '{0} {1}'.format(first_name, last_name)
+        # Create login field
+        login_field = SubElement(record, 'field', {'name': 'login'})
+        login_field.text = first_name.lower()
+        # Create password field
+        password_field = SubElement(record, 'field',
+                                    {'name': 'password'})
+        password_field.text = first_name.lower()
+        # Create timezone field
+        timezone_field = SubElement(record, 'field', {'name': 'tz'})
+        timezone_field.text = self.timezone
+        # Create groups field
+        SubElement(record, 'field',
+                   {'name': 'groups_id', 'eval': groups})
+        # Create roles field
+        SubElement(record, 'field',
+                   {'name': 'category_id', 'eval': category})
+        # Create location field
+        SubElement(record, 'field',
+                   {'name': 'location_ids', 'eval': locations})
+        # Create pos field
+        SubElement(record, 'field',
+                   {'name': 'pos_id', 'ref': self.pos})
+
+    def generate_users_per_ward(self, ward, beds_per_ward):
+        """Create users assigned to wards or beds."""
         # Create root element
         root = Element('openerp')
         # Create data inside root element
         data = SubElement(root, 'data')
 
-        for role, users_number in self.users_dictionary.iteritems():
+        for role, schema in self.users_schema.iteritems():
             # Initialise some variable to generate data for the current ward
-            users_per_ward, unassigned = users_number
-            beds_per_user = beds_number / users_per_ward
+            users_per_ward = schema.get('per_ward')
+            if users_per_ward:
+                groups_id = "[(4, ref('nh_clinical.{0}'))]".format(
+                    self.groups[role])
+                category_id = "[(4, ref('nh_clinical.{0}'))]".format(
+                    self.categories[role])
 
-            # Initialise the generator for every users' role,
-            # thus it will supply sequential numbers coherently to all users.
-            beds_number_generator = self.get_beds_number_generator(beds_number)
-            groups_id = "[(4, ref('nh_clinical.{0}'))]".format(
-                self.groups[role])
-            category_id = "[(4, ref('nh_clinical.{0}'))]".format(
-                self.categories[role])
-            first_name_generator = self.names_generators[role]
+                first_name_generator = self.names_generators.get(role)
 
-            # Add a comment to divide XML in sections by role
-            users_role_comment = Comment(' Ward {0}: {1} '.format(ward.upper(),
-                                                                  role))
-            data.append(users_role_comment)
+                beds_per_user = beds_per_ward / users_per_ward
 
-            # Create user assigned to a specific ward and beds.
-            # Every loop of the cycle, a different user is generated.
-            for _ in xrange(users_per_ward):
-                if role in ['nurse_in_charge', 'doctor', 'kiosk']:
-                    location_ids = "[[6, False, " \
-                                   "[ref('nhc_def_conf_location_w{}')]" \
-                                   "]]".format(ward)
-                elif role in ['hca', 'nurse']:
-                    # Retrieve sequential numbers
-                    # from the beds number generator,
-                    # only for a very limited number of times
-                    # (equal to number of beds per user).
-                    #
-                    # Use these sequential numbers
-                    # to format strings about locations.
-                    bed_list = ','.join(
-                        ["ref('nhc_def_conf_location_w{}_b{}')".format(
-                            ward, next(beds_number_generator))
-                         for _ in xrange(beds_per_user)]
+                # Initialise the generator for every users' role,
+                # so it will supply sequential numbers coherently to all users.
+                beds_number_generator = self.get_beds_number_generator(
+                    beds_per_ward)
+
+                # Add a comment to divide XML in sections by role
+                users_role_comment = Comment(' Ward {0}: {1} '.format(
+                    ward.upper(), role))
+                data.append(users_role_comment)
+
+                # Create user assigned to a specific ward (or beds).
+                for _ in xrange(users_per_ward):
+                    if role in self.assignable_to_ward:
+                        location_ids = "[[6, False, " \
+                                       "[ref('nhc_def_conf_location_w{}')]" \
+                                       "]]".format(ward)
+                    elif role in self.assignable_to_bed:
+                        # Retrieve sequential numbers
+                        # from the beds number generator,
+                        # only for a very limited number of times
+                        # (equal to number of beds per user).
+                        #
+                        # Use these sequential numbers
+                        # to format strings about locations.
+                        bed_list = ','.join(
+                            ["ref('nhc_def_conf_location_w{}_b{}')".format(
+                                ward, next(beds_number_generator))
+                             for _ in xrange(beds_per_user)]
+                        )
+                        location_ids = "[[6, False, [{0}]]]".format(bed_list)
+                    else:
+                        location_ids = "[[6, False, []]]"
+                    self.build_user_data(data, role, first_name_generator,
+                                         groups_id, category_id, location_ids)
+        return root
+
+    def generate_users_not_assigned(self):
+        """Create users not assigned to any ward."""
+        for role, schema in self.users_schema.iteritems():
+            # Initialise some variable to generate users data
+            unassigned = schema.get('unassigned')
+            if unassigned:
+                groups_id = "[(4, ref('nh_clinical.{0}'))]".format(
+                    self.groups[role])
+                category_id = "[(4, ref('nh_clinical.{0}'))]".format(
+                    self.categories[role])
+                first_name_generator = self.names_generators.get(role)
+                location_ids = "[[6, False, []]]"
+
+                # Add a comment to divide XML in sections by role
+                users_role_comment = Comment(' {0} '.format(role))
+                self.class_data.append(users_role_comment)
+
+                for _ in xrange(unassigned):
+                    self.build_user_data(self.class_data, role,
+                                         first_name_generator, groups_id,
+                                         category_id, location_ids)
+
+    def generate_multi_wards_users(self, wards_list):
+        """
+        Create users assigned to more than one ward
+        (e.g. Senior manager, eObs admin)
+        """
+        for role, schema in self.users_schema.iteritems():
+            # Initialise some variable to generate users data
+            multi_wards = schema.get('multi_wards')
+            total_users = schema.get('total')
+            if multi_wards and total_users:
+                groups_id = "[(4, ref('nh_clinical.{0}'))]".format(
+                    self.groups[role])
+                category_id = "[(4, ref('nh_clinical.{0}'))]".format(
+                    self.categories[role])
+
+                first_name_generator = self.names_generators.get(role)
+
+                # Add a comment to divide XML in sections by role
+                users_role_comment = Comment(' {0} '.format(role))
+                self.class_data.append(users_role_comment)
+
+                if multi_wards == 'all':
+                    wards_location = ','.join(
+                        ["ref('nhc_def_conf_location_w{}')".format(w)
+                         for w in wards_list]
                     )
-                    location_ids = "[[6, False, [{0}]]]".format(bed_list)
-
-                first_name = next(first_name_generator)
-                last_name = self.data_generator.last_name()
-                record = SubElement(data, 'record',
-                                    {'model': 'res.users',
-                                     'id': 'nhc_def_conf_{0}_{1}_user'.format(
-                                         role, first_name.lower())})
-                # Create user name field
-                name_field = SubElement(record, 'field', {'name': 'name'})
-                name_field.text = '{0} {1}'.format(first_name, last_name)
-                # Create login field
-                login_field = SubElement(record, 'field', {'name': 'login'})
-                login_field.text = first_name.lower()
-                # Create password field
-                password_field = SubElement(record, 'field',
-                                            {'name': 'password'})
-                password_field.text = first_name.lower()
-                # Create timezone field
-                timezone_field = SubElement(record, 'field', {'name': 'tz'})
-                timezone_field.text = self.timezone
-                # Create groups field
-                SubElement(record, 'field',
-                           {'name': 'groups_id', 'eval': groups_id})
-                # Create roles field
-                SubElement(record, 'field',
-                           {'name': 'category_id', 'eval': category_id})
-                # Create location field
-                SubElement(record, 'field',
-                           {'name': 'location_ids', 'eval': location_ids})
-                # Create pos field
-                SubElement(record, 'field',
-                           {'name': 'pos_id', 'ref': self.pos})
-
-            # Create user not assigned to any ward
-            for _ in xrange(unassigned):
-                first_name = next(first_name_generator)
-                last_name = self.data_generator.last_name()
-                record = SubElement(data, 'record',
-                                    {'model': 'res.users',
-                                     'id': 'nhc_def_conf_{0}_{1}_user'.format(
-                                         role, first_name.lower())})
-                # Create user name field
-                name_field = SubElement(record, 'field', {'name': 'name'})
-                name_field.text = '{0} {1}'.format(first_name, last_name)
-                # Create login field
-                login_field = SubElement(record, 'field', {'name': 'login'})
-                login_field.text = first_name.lower()
-                # Create password field
-                password_field = SubElement(record, 'field',
-                                            {'name': 'password'})
-                password_field.text = first_name.lower()
-                # Create timezone field
-                timezone_field = SubElement(record, 'field', {'name': 'tz'})
-                timezone_field.text = self.timezone
-                # Create groups field
-                SubElement(record, 'field',
-                           {'name': 'groups_id', 'eval': groups_id})
-                # Create roles field
-                SubElement(record, 'field',
-                           {'name': 'category_id', 'eval': category_id})
-                # Create location field
-                SubElement(record, 'field',
-                           {'name': 'location_ids',
-                            'eval': '[[6, False, []]]'})
-                # Create pos field
-                SubElement(record, 'field',
-                           {'name': 'pos_id', 'ref': self.pos})
-
-        # Pretty format the XML file
-        self.indent(root)
-
-        if not xml_file:
-            # Print on system standard output
-            dump(root)
-        else:
-            # Write to XML file
-            xml_tree = ElementTree(root)
-            xml_tree.write(xml_file)
+                    location_ids = "[[6, False, [{0}]]]".format(wards_location)
+                    for _ in xrange(total_users):
+                        self.build_user_data(self.class_data, role,
+                                             first_name_generator, groups_id,
+                                             category_id, location_ids)
+                elif len(multi_wards) == total_users:
+                    for wards in multi_wards:
+                        wards_location = ','.join(
+                            ["ref('nhc_def_conf_location_w{}')".format(w)
+                             for w in wards]
+                        )
+                        location_ids = "[[6, False, [{0}]]]".format(
+                            wards_location)
+                        self.build_user_data(self.class_data, role,
+                                             first_name_generator, groups_id,
+                                             category_id, location_ids)

@@ -25,7 +25,7 @@ def get_erppeek_client(server='http://localhost:8069', db='openerp',
 
 class DischargeTransferCoordinator(object):
 
-    def __int__(self, server, database, user, password):
+    def __init__(self, server, database, user, password):
         client = get_erppeek_client(server=server, db=database, user=user,
                                     password=password)
 

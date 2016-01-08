@@ -14,7 +14,8 @@ setup(
     entry_points={
         "console_scripts": [
             "generate_openeobs_demo_data = demo_data_generators.__main__:main",
-            "run_smoke_tests = smoketest.__main__:main"
+            "run_smoke_tests = smoketest.__main__:main",
+            "setup_openeobs_demo = demo_setup_tools.__main__:main"
         ]
     },
     install_requires=['ERPPeek==1.6.1', 'argparse>=1.2.1'],

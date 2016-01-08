@@ -2,7 +2,6 @@ import sys
 import unittest
 import argparse
 from read_demo_data import UsersSmokeTest
-from test_observations import ObservationsSmokeTest
 
 PARSER = argparse.ArgumentParser('Run smoke tests for Open-eObs')
 PARSER.add_argument('database', type=str,
@@ -24,11 +23,6 @@ def main():
     UsersSmokeTest.DATABASE = args.database
     UsersSmokeTest.USER = args.user
     UsersSmokeTest.PASSWORD = args.password
-
-    ObservationsSmokeTest.SERVER = args.server
-    ObservationsSmokeTest.DATABASE = args.database
-    ObservationsSmokeTest.USER = args.user
-    ObservationsSmokeTest.PASSWORD = args.password
 
     suite = unittest.TestLoader().loadTestsFromTestCase(UsersSmokeTest)
     unittest.TextTestRunner(verbosity=2).run(suite)

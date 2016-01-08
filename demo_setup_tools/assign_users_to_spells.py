@@ -54,6 +54,3 @@ class ReallocateWardManagers(object):
                 'location_ids': [[6, False, current_foo]]
             })
             resp.complete(resp_act)
-
-
-ReallocateWardManagers('http://localhost:8069', 'eobs_demo_data_master', user='olga', password='olga')

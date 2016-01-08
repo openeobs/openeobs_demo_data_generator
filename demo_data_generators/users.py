@@ -11,7 +11,7 @@ from xml.etree.ElementTree import Element, SubElement, Comment
 
 class UsersXMLGenerator(object):
 
-    def __init__(self, pos, users_schema):
+    def __init__(self, users_schema):
         """
         Initialise the users XML generator, declaring variables and generators.
 
@@ -41,12 +41,9 @@ class UsersXMLGenerator(object):
                      to briefly list all the wards present in the POS).
               value type: tuple of tuples (or string)
 
-        :param pos: reference ID of the POS
-        :type pos: str
         :param users_schema: complete schema of users' assignment to wards
         :type users_schema: dict (see the docstring for further details)
         """
-        self.pos = pos
         self.users_schema = users_schema
 
         # Create root element
@@ -163,7 +160,7 @@ class UsersXMLGenerator(object):
                    {'name': 'location_ids', 'eval': locations})
         # Create pos field
         SubElement(record, 'field',
-                   {'name': 'pos_id', 'ref': self.pos})
+                   {'name': 'pos_id', 'ref': 'nhc_def_conf_pos_hospital'})
 
     def generate_users_per_ward(self, ward, beds_per_ward):
         """Create users assigned to wards or beds."""

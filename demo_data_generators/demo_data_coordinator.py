@@ -9,13 +9,14 @@ from demo_data_generators.admissions import AdmissionsGenerator
 from demo_data_generators.locations import LocationsGenerator
 from demo_data_generators.patients import PatientsGenerator
 from demo_data_generators.placements import PlacementsGenerator
+from demo_data_generators.pos import POSGenerator
 from demo_data_generators.spells import SpellsGenerator
 from demo_data_generators.users import UsersXMLGenerator
 
 
 class DemoDataCoordinator(object):
-    """Coordinates demo data"""
-    def __init__(self, pos, wards, beds_per_ward, bed_patient_per_ward,
+    """Coordinate demo data generation."""
+    def __init__(self, wards, beds_per_ward, bed_patient_per_ward,
                  non_bed_patient_per_ward, users_schema, data_folder):
 
         total_patients_per_ward = \
@@ -34,7 +35,12 @@ class DemoDataCoordinator(object):
         patient_id_regex_string = r'nhc_demo_patient_(\d+)'
         self.patient_id_regex = re.compile(patient_id_regex_string)
 
-        users_generator = UsersXMLGenerator(pos, users_schema)
+        point_of_service = POSGenerator()
+        self.indent(point_of_service.root)
+        users_tree = ElementTree(point_of_service.root)
+        users_tree.write(os.path.join(data_folder, 'pos.xml'))
+
+        users_generator = UsersXMLGenerator(users_schema)
         users_generator.generate_multi_wards_users(wards)
         users_generator.generate_users_not_assigned()
         self.indent(users_generator.class_root)
@@ -114,57 +120,3 @@ class DemoDataCoordinator(object):
         else:
             if level and (not elem.tail or not elem.tail.strip()):
                 elem.tail = i
-
-
-pos = 'nhc_def_conf_pos_hospital'
-users_schema = {
-    'hca': {
-        'total': 55,
-        'per_ward': 10,
-        'unassigned': 5,
-    },
-    'nurse': {
-        'total': 55,
-        'per_ward': 10,
-        'unassigned': 5,
-    },
-    'ward_manager': {
-        'total': 6,
-        'per_ward': 1,
-        'unassigned': 1,
-    },
-    'senior_manager': {
-        'total': 3,
-        'per_ward': 0,
-        'unassigned': 0,
-        'multi_wards': (
-            ('a', 'b', 'c'),
-            ('d', 'e'),
-            ('a', 'b', 'c', 'd', 'e')
-        )
-    },
-    'doctor': {
-        'total': 24,
-        'per_ward': 4,
-        'unassigned': 4,
-    },
-    'kiosk': {
-        'total': 5,
-        'per_ward': 1,
-        'unassigned': 0,
-    },
-    'admin': {
-        'total': 1,
-        'per_ward': 0,
-        'unassigned': 0,
-        'multi_wards': 'all'
-    }
-}
-wards = ['a', 'b', 'c', 'd', 'e']
-beds_per_ward = 30
-bed_pat_per_ward = 28
-non_bed_pat_per_ward = 12
-data_folder = os.path.dirname(__file__)
-DemoDataCoordinator(pos, wards, beds_per_ward, bed_pat_per_ward,
-                    non_bed_pat_per_ward, users_schema,
-                    os.path.join(data_folder, 'DATA'))

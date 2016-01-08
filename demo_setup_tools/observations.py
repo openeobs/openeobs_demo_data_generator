@@ -9,7 +9,7 @@ class SubmitObservations(object):
         SubmitInitialObservations(client, days)
 
         patient_pool = client.model('nh.clinical.patient')
-        patient_ids = patient_pool([])
+        patient_ids = patient_pool.search([])
 
         # break list of patient ids into sub-lists of length 10
         n = 10

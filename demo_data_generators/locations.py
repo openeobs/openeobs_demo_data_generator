@@ -27,7 +27,9 @@ class LocationsGenerator(object):
         """
         A function to create a bunch of patients for the XML document
         :param number_of_beds: The number of beds to generate
+        :type number_of_beds: int
         :param ward_name: Name of the ward beds belong in
+        :type ward_name: str
         """
         for item in xrange(0, number_of_beds):
             bed_id = item + 1
@@ -37,7 +39,7 @@ class LocationsGenerator(object):
 
     def generate_location(self, rid, name, usage, parent, ward, bed_number):
         """Generate a location"""
-        # Create record with id and patient model
+        # Create record with location data
         record = SubElement(
             self.data,
             'record',
@@ -47,11 +49,11 @@ class LocationsGenerator(object):
             }
         )
 
-        # create DOB field with fake data
+        # create name field with fake data
         name_field = SubElement(record, 'field', {'name': 'name'})
         name_field.text = name
 
-        # Create Gender / Sex fields with fake data
+        # create code field with fake data
         code_field = SubElement(record, 'field', {'name': 'code'})
         if usage == 'ward':
             code_field.text = ward.upper()
@@ -60,14 +62,15 @@ class LocationsGenerator(object):
         else:
             code_field.text = rid.upper().replace('_', '')
 
+        # create type field
         type_field = SubElement(record, 'field', {'name': 'type'})
         type_field.text = 'poc'
 
-        # Create Ethnicity
+        # create usage field
         usage_field = SubElement(record, 'field', {'name': 'usage'})
         usage_field.text = usage
 
-        # Create location id
+        # create a reference to parent location
         SubElement(record, 'field', {
             'name': 'parent_id',
             'ref': 'nhc_def_conf_location_{0}'.format(parent)

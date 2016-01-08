@@ -2,6 +2,7 @@ import sys
 import argparse
 from assign_users_to_spells import ReallocateWardManagers
 from observations import SubmitObservations
+from discharge_transfer import DischargeTransferCoordinator
 
 PARSER = argparse.ArgumentParser('Post Open-eObs Demo installation operations')
 PARSER.add_argument('database', type=str,
@@ -28,6 +29,7 @@ def main():
     days = args.days
     ReallocateWardManagers(server, database, 'olga', 'olga')
     SubmitObservations(server, database, user, password, days)
+    DischargeTransferCoordinator(server, database, 'adt', 'adt')
 
 
 if __name__ == '__main__':

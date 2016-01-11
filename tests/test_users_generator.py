@@ -142,3 +142,14 @@ class TestUsersGenerator(unittest.TestCase):
         gen = UsersGenerator(basic_schema)
         self.assertEqual(gen.users_schema, basic_schema,
                          'Incorrect User Schema stored')
+
+    def test_bed_number_method(self):
+        """
+        Test that the bed number generator works
+        """
+        gen = UsersGenerator({})
+        bed_number_gen = gen.get_beds_number_generator(2)
+        bed_number_first = bed_number_gen.next()
+        bed_number_last = bed_number_gen.next()
+        self.assertEqual(bed_number_first, 1, 'Incorrect first generator call')
+        self.assertEqual(bed_number_last, 2, 'Incorrect last generator call')

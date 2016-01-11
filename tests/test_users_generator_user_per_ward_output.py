@@ -12,24 +12,24 @@ class TestUsersGeneratorMultiWardOutput(unittest.TestCase):
         Setup an example users generator instance so can use the record
         """
         john_schema = {  # http://cdn.makeagif.com/media/9-13-2015/28JfPx.gif
-            'ward_manager': {
+            'nurse': {
                 'total': 1,
                 'per_ward': 1,
                 'unassigned': 0,
-                'multi_wards': [['a', 'b']]
+                'multi_wards': [[]]
             }
         }
         gen = UsersGenerator(john_schema)
-        gen.names_generators['ward_manager'] = (n for n in ['Waino'])
-        gen.generate_multi_wards_users(['a'])
-        self.record = gen.class_data.findall('record')[0]
+        gen.names_generators['nurse'] = (n for n in ['Nadine'])
+        users = gen.generate_users_per_ward('a', 1)
+        self.record = users.find('data').findall('record')[0]
 
     def test_record(self):
         """
         Make sure the record has teh correct id and model
         """
         self.assertEqual(self.record.attrib['id'],
-                         'nhc_def_conf_ward_manager_waino_user',
+                         'nhc_def_conf_nurse_nadine_user',
                          'Incorrect ID ')
         self.assertEqual(self.record.attrib['model'],
                          'res.users',
@@ -40,21 +40,21 @@ class TestUsersGeneratorMultiWardOutput(unittest.TestCase):
         Make sure the name field is correct
         """
         field = self.record.find('field[@name=\'name\']')
-        self.assertTrue('Waino' in field.text, 'Incorrect Name Field')
+        self.assertTrue('Nadine' in field.text, 'Incorrect Name Field')
 
     def test_login_field(self):
         """
         Make sure the login field is correct
         """
         field = self.record.find('field[@name=\'login\']')
-        self.assertEqual(field.text, 'waino', 'Incorrect login Field')
+        self.assertEqual(field.text, 'nadine', 'Incorrect login Field')
 
     def test_password_field(self):
         """
         Make sure the password field is correct
         """
         field = self.record.find('field[@name=\'password\']')
-        self.assertEqual(field.text, 'waino', 'Incorrect password Field')
+        self.assertEqual(field.text, 'nadine', 'Incorrect password Field')
 
     def test_timezone_field(self):
         """
@@ -70,7 +70,7 @@ class TestUsersGeneratorMultiWardOutput(unittest.TestCase):
         """
         field = self.record.find('field[@name=\'groups_id\']')
         self.assertEqual(field.attrib['eval'],
-                         '[(4, ref(\'nh_clinical.group_nhc_ward_manager\'))]',
+                         '[(4, ref(\'nh_clinical.group_nhc_nurse\'))]',
                          'Incorrect eval on groups id')
 
     def test_category_field(self):
@@ -79,7 +79,7 @@ class TestUsersGeneratorMultiWardOutput(unittest.TestCase):
         """
         field = self.record.find('field[@name=\'category_id\']')
         self.assertEqual(field.attrib['eval'],
-                         '[(4, ref(\'nh_clinical.role_nhc_ward_manager\'))]',
+                         '[(4, ref(\'nh_clinical.role_nhc_nurse\'))]',
                          'Incorrect eval on category id')
 
     def test_locations_field(self):
@@ -87,10 +87,11 @@ class TestUsersGeneratorMultiWardOutput(unittest.TestCase):
         Make sure the locations field is correct
         """
         field = self.record.find('field[@name=\'location_ids\']')
-        self.assertEqual(field.attrib['eval'],
-                         '[[6, False, [ref(\'nhc_def_conf_location_wa\'),'
-                         'ref(\'nhc_def_conf_location_wb\')]]]',
-                         'Incorrect eval on location ids')
+        self.assertEqual(
+            field.attrib['eval'],
+            '[[6, False, [ref(\'nhc_def_conf_location_wa_b1\')]]]',
+            'Incorrect eval on location ids'
+        )
 
     def test_pos_field(self):
         """

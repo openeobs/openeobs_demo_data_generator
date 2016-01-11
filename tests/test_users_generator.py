@@ -153,3 +153,15 @@ class TestUsersGenerator(unittest.TestCase):
         bed_number_last = bed_number_gen.next()
         self.assertEqual(bed_number_first, 1, 'Incorrect first generator call')
         self.assertEqual(bed_number_last, 2, 'Incorrect last generator call')
+
+    def test_create_adt_user(self):
+        """
+        Test that the class has a means of creating the ADT user
+        """
+        gen = UsersGenerator({})
+        gen.generate_adt_user()
+        records = gen.class_data.findall('record')
+        self.assertEqual(len(records), 1, 'Incorrect number of records')
+        adt_record = records[0]
+        login = adt_record.find('field[@name=\'login\']')
+        self.assertEqual(login.text, 'adt', 'Incorrect login name')

@@ -9,11 +9,11 @@ from faker.providers.person.en import Provider
 from xml.etree.ElementTree import Element, SubElement, Comment
 
 
-class UsersXMLGenerator(object):
+class UsersGenerator(object):
 
     def __init__(self, users_schema):
         """
-        Initialise the users XML generator, declaring variables and generators.
+        Initialise the users generator, declaring variables and generators.
 
         Particular attention must be payed to the ``users_schema`` parameter,
         since it must match the following specification:
@@ -49,7 +49,8 @@ class UsersXMLGenerator(object):
         # Create root element
         self.class_root = Element('openerp')
         # Create data inside root element
-        self.class_data = SubElement(self.class_root, 'data')
+        self.class_data = SubElement(self.class_root, 'data',
+                                     {'noupdate': '1'})
 
         self.data_generator = Factory.create()
 
@@ -191,7 +192,7 @@ class UsersXMLGenerator(object):
         # Create root element
         root = Element('openerp')
         # Create data inside root element
-        data = SubElement(root, 'data')
+        data = SubElement(root, 'data', {'noupdate': '1'})
 
         for role, schema in self.users_schema.iteritems():
             # Initialise some variable to generate data for the current ward

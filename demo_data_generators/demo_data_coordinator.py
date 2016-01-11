@@ -11,7 +11,7 @@ from demo_data_generators.patients import PatientsGenerator
 from demo_data_generators.placements import PlacementsGenerator
 from demo_data_generators.pos import POSGenerator
 from demo_data_generators.spells import SpellsGenerator
-from demo_data_generators.users import UsersXMLGenerator
+from demo_data_generators.users import UsersGenerator
 
 
 class DemoDataCoordinator(object):
@@ -40,7 +40,7 @@ class DemoDataCoordinator(object):
         users_tree = ElementTree(point_of_service.root)
         users_tree.write(os.path.join(data_folder, 'pos.xml'))
 
-        users_generator = UsersXMLGenerator(users_schema)
+        users_generator = UsersGenerator(users_schema)
         users_generator.generate_adt_user()
         users_generator.generate_multi_wards_users(wards)
         users_generator.generate_users_not_assigned()

@@ -21,5 +21,3 @@ class Patient(object):
         self.spell_activity_id = spell_activity_id
         self.bed_location_id = bell_location_id
         self.date_terminated = date_terminated
-
-

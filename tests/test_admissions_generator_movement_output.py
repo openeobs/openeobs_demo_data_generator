@@ -20,7 +20,7 @@ class TestAdmissionsGeneratorMovementOutput(unittest.TestCase):
         self.model_record = records[7]
         self.activity_update_record = records[8]
         eval_regex = r"(\(datetime\.now\(\) \+ timedelta\(-\d\)\)" \
-                     r"\.strftime\('%Y-%m-%d 00:00:00'\))"
+                     r"\.strftime\('%Y-%m-%d %H:%M:%S'\))"
         self.eval_regex = re.compile(eval_regex)
 
     def test_activity_record(self):

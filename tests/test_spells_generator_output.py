@@ -20,7 +20,7 @@ class TestSpellsGeneratorOutput(unittest.TestCase):
         self.spell_record = records[1]
         self.activity_update_record = records[2]
         eval_regex = r"(\(datetime\.now\(\) \+ timedelta\(-\d\)\)" \
-                     r"\.strftime\('%Y-%m-%d 00:00:00'\))"
+                     r"\.strftime\('%Y-%m-%d %H:%M:%S'\))"
         self.eval_regex = re.compile(eval_regex)
 
     def test_spell_activity_record(self):

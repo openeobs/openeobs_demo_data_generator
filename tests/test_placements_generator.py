@@ -39,7 +39,7 @@ class TestPlacementsGenerator(unittest.TestCase):
         on elements for the date admitted
         """
         eval_string = '(datetime.now() + timedelta({0}))' \
-                      '.strftime(\'%Y-%m-%d 00:00:00\')'
+                      '.strftime(\'%Y-%m-%d %H:%M:%S\')'
         self.assertEqual(self.gen.admit_date_eval_string, eval_string,
                          'Incorrect Admit date eval string List')
 

@@ -15,15 +15,7 @@ class TestPlacementsGenerator(unittest.TestCase):
         PatientsGenerator need to create ourselves an instance
         """
         bed_patient = PatientsGenerator(0, 1, 0, 'a')
-        self.gen = PlacementsGenerator(bed_patient)
-
-    def test_has_admit_offset_list(self):
-        """
-        Generator has an admit offset list
-        """
-        offset_list = ['-1', '-2']
-        self.assertEqual(offset_list, self.gen.admit_offset_list,
-                         'Admit offset list incorrect')
+        self.gen = PlacementsGenerator(bed_patient, [-1])
 
     def test_no_update_on_data_element(self):
         """

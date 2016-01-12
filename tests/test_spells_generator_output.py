@@ -14,7 +14,7 @@ class TestSpellsGeneratorOutput(unittest.TestCase):
         Setup an example patients generator instance so can use the record
         """
         self.patientgen = PatientsGenerator(0, 1, 0, 'a')
-        self.spellgen = SpellsGenerator(self.patientgen)
+        self.spellgen = SpellsGenerator(self.patientgen, [-1])
         records = self.spellgen.data.findall('record')
         self.spell_activity_record = records[0]
         self.spell_record = records[1]

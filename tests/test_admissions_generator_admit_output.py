@@ -14,7 +14,7 @@ class TestAdmissionsGeneratorAdmitOutput(unittest.TestCase):
         Setup an example patients generator instance so can use the record
         """
         self.patientgen = PatientsGenerator(0, 1, 0, 'a')
-        self.gen = AdmissionsGenerator(self.patientgen)
+        self.gen = AdmissionsGenerator(self.patientgen, [-1])
         records = self.gen.data.findall('record')
         self.activity_record = records[3]
         self.model_record = records[4]

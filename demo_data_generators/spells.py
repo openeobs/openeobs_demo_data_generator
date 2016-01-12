@@ -1,6 +1,5 @@
 """Generates spells"""
 from xml.etree.ElementTree import Element, SubElement, Comment
-import random
 import re
 
 

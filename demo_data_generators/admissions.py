@@ -1,7 +1,6 @@
 # pylint: disable=C0103
 """Generates admissions"""
 from xml.etree.ElementTree import Element, SubElement, Comment
-import random
 import re
 
 

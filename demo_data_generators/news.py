@@ -256,7 +256,8 @@ class NewsGenerator(object):
             )
             avpu.text = self.values[risk]['avpu_text']
 
-    def create_activity_news_record(self, patient, date, state, sequence, user_id):
+    def create_activity_news_record(self, patient, date, state, sequence,
+                                    user_id):
         """Create activity NEWS record"""
 
         # Create nh.activity NEWS record with id

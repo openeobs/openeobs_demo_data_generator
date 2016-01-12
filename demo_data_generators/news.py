@@ -132,7 +132,7 @@ class NewsGenerator(object):
         return False
 
     def generate_partial_news_observation(self, patient, creator, user_id,
-                                          schedule_date, sequence):
+                                          schedule_date, risk, sequence):
         self.data.append(
             Comment(
                 'NEWS data for patient {0}'.format(patient.patient_id)
@@ -141,8 +141,8 @@ class NewsGenerator(object):
         # creates a completed observation
         self.create_activity_news_record(
             patient, creator, schedule_date, 'completed', sequence, user_id)
-        # creates a partial observation (i.e. missing parameters)
-        self.create_news_record(patient, 'partial', sequence)
+        # creates a partial observation
+        self.create_partial_news_record(patient, risk, sequence)
         self.update_activity_news(patient, sequence)
 
     def generate_completed_news_data(
@@ -230,6 +230,99 @@ class NewsGenerator(object):
                 'eval': eval_string.format(patient.id, sequence)
             }
         )
+
+    def create_partial_news_record(self, patient, risk, sequence):
+        """Create partial NEWS record"""
+
+        # Create nh.activity NEWS record with id
+        news_record = SubElement(
+            self.data,
+            'record',
+            {
+                'model': 'nh.clinical.patient.observation.ews',
+                'id': 'nhc_demo_news_{0}_{1}'.format(
+                    patient.id, sequence)
+            }
+        )
+
+        # Create activity_id reference
+        SubElement(
+            news_record,
+            'field',
+            {
+                'name': 'activity_id',
+                'ref': 'nhc_activity_demo_news_{0}_{1}'.format(
+                    patient.id, sequence)
+            }
+        )
+
+        # Create patient_id reference
+        SubElement(
+            news_record,
+            'field',
+            {
+                'name': 'patient_id',
+                'ref': 'nh_clinical.' + patient.patient_id
+            }
+        )
+
+        # Create partial observation data (missing o2 rate)
+        SubElement(
+            news_record,
+            'field',
+            {
+                'name': 'respiration_rate',
+                'eval': self.values[risk]['respiration_rate']
+            }
+        )
+        SubElement(
+            news_record,
+            'field',
+            {
+                'name': 'oxygen_administration_flag',
+                'eval': self.values[risk]['oxygen_administration_flag']
+            }
+        )
+        SubElement(
+            news_record,
+            'field',
+            {
+                'name': 'body_temperature',
+                'eval': self.values[risk]['body_temperature']
+            }
+        )
+        SubElement(
+            news_record,
+            'field',
+            {
+                'name': 'blood_pressure_systolic',
+                'eval': self.values[risk]['blood_pressure_systolic']
+            }
+        )
+        SubElement(
+            news_record,
+            'field',
+            {
+                'name': 'blood_pressure_diastolic',
+                'eval': self.values[risk]['blood_pressure_diastolic']
+            }
+        )
+        SubElement(
+            news_record,
+            'field',
+            {
+                'name': 'pulse_rate',
+                'eval': self.values[risk]['pulse_rate']
+            }
+        )
+        avpu = SubElement(
+            news_record,
+            'field',
+            {
+                'name': 'avpu_text',
+            }
+        )
+        avpu.text = self.values[risk]['avpu_text']
 
     def create_news_record(self, patient, risk, sequence):
         """Create NEWS record"""

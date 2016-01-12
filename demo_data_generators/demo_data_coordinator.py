@@ -3,6 +3,7 @@
 """Coordinates demo data"""
 import re
 import os
+import random
 
 from xml.etree.ElementTree import ElementTree
 from demo_data_generators.admissions import AdmissionsGenerator
@@ -67,12 +68,15 @@ class DemoDataCoordinator(object):
                 non_bed_patient_per_ward,
                 ward
             )
+            offsets = [random.choice(
+                self.admit_offset_list) for _ in range(
+                len(patients.data.findall('record')))]
             # Spells demo data
-            spells = SpellsGenerator(patients)
+            spells = SpellsGenerator(patients, offsets)
             # Admissions demo data
-            admissions = AdmissionsGenerator(patients)
+            admissions = AdmissionsGenerator(patients, offsets)
             # Placements demo data
-            placements = PlacementsGenerator(patients)
+            placements = PlacementsGenerator(patients, offsets)
 
             # set strategy parameters for ward
             news_patients = patients_factory(placements.root)

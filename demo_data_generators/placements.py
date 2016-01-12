@@ -7,7 +7,7 @@ import re
 
 class PlacementsGenerator(object):
     """Generates placements"""
-    def __init__(self, patients):
+    def __init__(self, patients, offsets):
 
         # Create root element
         self.root = Element('openerp')
@@ -20,7 +20,7 @@ class PlacementsGenerator(object):
         self.demo_patients = patient_data.findall('record')
 
         # List of time periods to randomly offset admissions
-        self.admit_offset_list = ['-1', '-2']
+        self.offsets = offsets
         self.admit_date_eval_string = '(datetime.now() + timedelta({0}))' \
                                       '.strftime(\'%Y-%m-%d %H:%M:%S\')'
 
@@ -67,18 +67,20 @@ class PlacementsGenerator(object):
         are in
         :return:
         """
+        i = 0
         for patient in self.demo_patients:
             patient_id_match = re.match(self.patient_id_regex,
                                         patient.attrib['id'])
             patient_id = patient_id_match.groups()[0]
-            admit_offset = random.choice(self.admit_offset_list)
             # Generate placement data
             location_el = patient.find('field[@name=\'current_location_id\']')
             location = location_el.attrib['ref']
             if '_b' in location[-6:]:
-                self.generate_placement_data(patient_id, patient, admit_offset)
+                self.generate_placement_data(
+                    patient_id, patient, self.offsets[i])
                 self.generate_placement_movement_data(patient_id, patient,
-                                                      admit_offset)
+                                                      self.offsets[i])
+            i += 1
 
     def create_activity_placement_record(self, patient_id, patient,
                                          admit_offset):

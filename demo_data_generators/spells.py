@@ -6,7 +6,7 @@ import re
 
 class SpellsGenerator(object):
     """Generates spells"""
-    def __init__(self, patients):
+    def __init__(self, patients, offsets):
 
         # Create root element
         self.root = Element('openerp')
@@ -19,7 +19,7 @@ class SpellsGenerator(object):
         self.demo_patients = patient_data.findall('record')
 
         # List of time periods to randomly offset admissions
-        self.admit_offset_list = ['-1', '-2']
+        self.offsets = offsets
         self.admit_date_eval_string = '(datetime.now() + timedelta({0}))' \
                                       '.strftime(\'%Y-%m-%d %H:%M:%S\')'
 
@@ -46,13 +46,14 @@ class SpellsGenerator(object):
         are in
         :return:
         """
+        i = 0
         for patient in self.demo_patients:
             patient_id_match = re.match(self.patient_id_regex,
                                         patient.attrib['id'])
             patient_id = patient_id_match.groups()[0]
-            admit_offset = random.choice(self.admit_offset_list)
 
-            self.generate_spell_data(patient_id, patient, admit_offset)
+            self.generate_spell_data(patient_id, patient, self.offsets[i])
+            i += 1
 
     def create_activity_spell_record(self, patient_id, patient, admit_offset):
         """Creates activity spell record"""

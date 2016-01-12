@@ -7,7 +7,7 @@ import re
 
 class AdmissionsGenerator(object):
     """Generates admissions"""
-    def __init__(self, patients):
+    def __init__(self, patients, offsets):
 
         # Create root element
         self.root = Element('openerp')
@@ -20,7 +20,7 @@ class AdmissionsGenerator(object):
         self.demo_patients = patient_data.findall('record')
 
         # List of time periods to randomly offset admissions
-        self.admit_offset_list = ['-1', '-2']
+        self.offsets = offsets
         self.admit_date_eval_string = '(datetime.now() + timedelta({0}))' \
                                       '.strftime(\'%Y-%m-%d %H:%M:%S\')'
 
@@ -73,15 +73,16 @@ class AdmissionsGenerator(object):
         are in
         :return:
         """
+        i = 0
         for patient in self.demo_patients:
             patient_id_match = re.match(self.patient_id_regex,
                                         patient.attrib['id'])
             patient_id = patient_id_match.groups()[0]
-            admit_offset = random.choice(self.admit_offset_list)
-            self.generate_adt_admit_data(patient_id, patient, admit_offset)
-            self.generate_admission_data(patient_id, patient, admit_offset)
+            self.generate_adt_admit_data(patient_id, patient, self.offsets[i])
+            self.generate_admission_data(patient_id, patient, self.offsets[i])
             self.generate_admit_movement_data(patient_id, patient,
-                                              admit_offset)
+                                              self.offsets[i])
+            i += 1
 
     def create_activity_admit_movement_record(self, patient_id, admit_offset):
         """Create activity admit movement record"""

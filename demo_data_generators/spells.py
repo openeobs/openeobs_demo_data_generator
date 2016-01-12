@@ -21,7 +21,7 @@ class SpellsGenerator(object):
         # List of time periods to randomly offset admissions
         self.admit_offset_list = ['-1', '-2']
         self.admit_date_eval_string = '(datetime.now() + timedelta({0}))' \
-                                      '.strftime(\'%Y-%m-%d 00:00:00\')'
+                                      '.strftime(\'%Y-%m-%d %H:%M:%S\')'
 
         # Regex to use to get the ID for a patient from id attribute on record
         patient_id_regex_string = r'nhc_demo_patient_(\d+)'

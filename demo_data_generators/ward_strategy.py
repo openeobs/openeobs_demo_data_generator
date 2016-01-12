@@ -1,4 +1,5 @@
 # coding=utf-8
+import random
 import re
 
 
@@ -26,6 +27,9 @@ class WardStrategy(object):
         self.user_ids = user_ids
         self.risk_distribution = risk_distribution
         self.partial_news_per_patient = partial_news_per_patient
+
+    def pick_user_id(self):
+        return random.choice(self.user_ids)
 
 
 def patients_factory(root):

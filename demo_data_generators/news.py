@@ -84,8 +84,9 @@ class NewsGenerator(object):
             while self.to_be_completed(offset, minutes):
                 print 'generating ' + str(sequence) + ' news for ' + \
                       patient.patient_id
+                user_id = ward_strategy.pick_user_id()
                 self.generate_completed_news_data(
-                    patient, schedule_date_eval, risk, sequence)
+                    patient, user_id, schedule_date_eval, risk, sequence)
                 minutes += self.minutes[risk]
                 patient.date_terminated = schedule_date_eval
                 sequence += 1
@@ -105,14 +106,14 @@ class NewsGenerator(object):
         return False
 
     def generate_completed_news_data(
-            self, patient, schedule_date, risk, sequence):
+            self, patient, user_id, schedule_date, risk, sequence):
         self.data.append(
             Comment(
                 'NEWS data for patient {0}'.format(patient.patient_id)
             )
         )
         self.create_activity_news_record(
-            patient, schedule_date, 'completed', sequence)
+            patient, schedule_date, 'completed', sequence, user_id)
         self.create_news_record(patient, risk, sequence)
         self.update_activity_news(patient, sequence)
 
@@ -255,7 +256,7 @@ class NewsGenerator(object):
             )
             avpu.text = self.values[risk]['avpu_text']
 
-    def create_activity_news_record(self, patient, date, state, sequence):
+    def create_activity_news_record(self, patient, date, state, sequence, user_id):
         """Create activity NEWS record"""
 
         # Create nh.activity NEWS record with id
@@ -349,5 +350,13 @@ class NewsGenerator(object):
                 {
                     'name': 'date_terminated',
                     'eval': date
+                }
+            )
+            SubElement(
+                activity_news_record,
+                'field',
+                {
+                    'name': 'terminate_uid',
+                    'ref': user_id
                 }
             )

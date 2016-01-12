@@ -18,7 +18,7 @@ class TestWardStrategy(unittest.TestCase):
         WardStrategy needs patient placements.
         """
         bed_patient = PatientsGenerator(0, 2, 0, 'a')
-        self.gen = PlacementsGenerator(bed_patient, [-1])
+        self.gen = PlacementsGenerator(bed_patient, [-1, -2])
 
     def test_patients_factory(self):
         patients = patients_factory(self.gen.root)

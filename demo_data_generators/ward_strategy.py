@@ -8,7 +8,7 @@ class Patient(object):
         self.id = None
         self.patient_id = None
         self.placement_id = None
-        self.activty_id = None
+        self.activity_id = None
         self.spell_activity_id = None
         self.date_terminated = None
 

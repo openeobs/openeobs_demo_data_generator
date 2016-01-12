@@ -12,6 +12,7 @@ from demo_data_generators.placements import PlacementsGenerator
 from demo_data_generators.pos import POSGenerator
 from demo_data_generators.spells import SpellsGenerator
 from demo_data_generators.users import UsersGenerator
+from demo_data_generators.ward_strategy import patients_factory, WardStrategy
 
 
 class DemoDataCoordinator(object):
@@ -70,6 +71,15 @@ class DemoDataCoordinator(object):
             admissions = AdmissionsGenerator(patients)
             # Placements demo data
             placements = PlacementsGenerator(patients)
+
+            # set strategy parameters for ward
+            patients = patients_factory(placements.root)
+            risk_distribution = {'high': 1, 'medium': 2, 'low': 10, 'none': 15}
+            partial_news_per_patient = 1
+            # Generate ward strategy here
+            ward_strategy = WardStrategy(
+                patients, risk_distribution, partial_news_per_patient
+            )
 
             # Pretty format the XML trees
             self.indent(locations.root)

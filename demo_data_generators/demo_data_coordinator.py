@@ -13,6 +13,7 @@ from demo_data_generators.pos import POSGenerator
 from demo_data_generators.spells import SpellsGenerator
 from demo_data_generators.users import UsersGenerator
 from demo_data_generators.ward_strategy import patients_factory, WardStrategy
+from demo_data_generators.news import NewsGenerator
 
 
 class DemoDataCoordinator(object):
@@ -73,13 +74,16 @@ class DemoDataCoordinator(object):
             placements = PlacementsGenerator(patients)
 
             # set strategy parameters for ward
-            patients = patients_factory(placements.root)
+            news_patients = patients_factory(placements.root)
             risk_distribution = {'high': 1, 'medium': 2, 'low': 10, 'none': 15}
             partial_news_per_patient = 1
             # Generate ward strategy here
             ward_strategy = WardStrategy(
-                patients, risk_distribution, partial_news_per_patient
+                news_patients, risk_distribution, partial_news_per_patient
             )
+
+            # NEWS demo data
+            news = NewsGenerator(ward_strategy)
 
             # Pretty format the XML trees
             self.indent(locations.root)
@@ -88,6 +92,7 @@ class DemoDataCoordinator(object):
             self.indent(spells.root)
             self.indent(admissions.root)
             self.indent(placements.root)
+            self.indent(news.root)
 
             # Actually write the XML files (creating them if needed)
             ward_folder = os.path.join(data_folder, 'ward_{0}'.format(ward))
@@ -115,6 +120,8 @@ class DemoDataCoordinator(object):
             placements_tree = ElementTree(placements.root)
             placements_tree.write(os.path.join(ward_folder,
                                                'demo_placements.xml'))
+            news_tree = ElementTree(news.root)
+            news_tree.write(os.path.join(ward_folder, 'demo_news.xml'))
 
     def indent(self, elem, level=0):
         """Indent data stored in an XML tree."""

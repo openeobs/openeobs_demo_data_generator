@@ -5,7 +5,7 @@ from xml.etree.ElementTree import Element, SubElement, Comment
 
 class NewsGenerator(object):
     """Generates NEWS Observations"""
-    def __init__(self, ward_collection):
+    def __init__(self, ward_strategy):
 
         # Create root element
         self.root = Element('openerp')
@@ -19,19 +19,19 @@ class NewsGenerator(object):
         self.values = {
             'high': {
                 'respiration_rate': '15',
-                'indirect_oxymetry_spo2': '99',
-                'oxygen_administration_flag': 'False',
-                'body_temperature': '37.5',
+                'indirect_oxymetry_spo2': '94',
+                'oxygen_administration_flag': 'True',
+                'body_temperature': '40.5',
                 'blood_pressure_systolic': '120',
                 'blood_pressure_diastolic': '80',
                 'pulse_rate': '65',
-                'avpu_text': 'A'
+                'avpu_text': 'V'
             },
             'medium': {
                 'respiration_rate': '15',
-                'indirect_oxymetry_spo2': '99',
+                'indirect_oxymetry_spo2': '95',
                 'oxygen_administration_flag': 'False',
-                'body_temperature': '37.5',
+                'body_temperature': '40.5',
                 'blood_pressure_systolic': '120',
                 'blood_pressure_diastolic': '80',
                 'pulse_rate': '65',
@@ -41,7 +41,7 @@ class NewsGenerator(object):
                 'respiration_rate': '15',
                 'indirect_oxymetry_spo2': '99',
                 'oxygen_administration_flag': 'False',
-                'body_temperature': '37.5',
+                'body_temperature': '40.5',
                 'blood_pressure_systolic': '120',
                 'blood_pressure_diastolic': '80',
                 'pulse_rate': '65',
@@ -60,8 +60,7 @@ class NewsGenerator(object):
         }
 
         # Generate the patient observations
-        for ward_strategy in ward_collection:
-            self.generate_news(ward_strategy)
+        self.generate_news(ward_strategy)
 
     def generate_news(self, ward_strategy):
         """
@@ -71,6 +70,8 @@ class NewsGenerator(object):
         """
         for patient in ward_strategy.patients:
             risk = self.get_risk(ward_strategy)
+            print 'generating news for ' + patient.patient_id + ' with risk ' \
+                  + risk
             offset_position = patient.date_terminated.find('timedelta(-') + 11
             offset = int(patient.date_terminated[offset_position])
             minutes = 60
@@ -81,16 +82,19 @@ class NewsGenerator(object):
             schedule_date_eval = schedule_date_eval.format(offset, minutes)
             # Generate observation data
             while self.to_be_completed(offset, minutes):
+                print 'generating ' + str(sequence) + ' news for ' + \
+                      patient.patient_id
                 self.generate_completed_news_data(
                     patient, schedule_date_eval, risk, sequence)
                 minutes += self.minutes[risk]
                 patient.date_terminated = schedule_date_eval
+                sequence += 1
                 schedule_date_eval = schedule_date_eval.format(offset, minutes)
             self.generate_scheduled_news_data(
                 patient, schedule_date_eval, sequence)
 
     def to_be_completed(self, offset, minutes):
-        return minutes/24*60 > offset
+        return float(minutes)/(24*60) < offset
 
     def get_risk(self, ward_strategy):
         for key in ward_strategy.risk_distribution.keys():
@@ -132,7 +136,7 @@ class NewsGenerator(object):
             'record',
             {
                 'model': 'nh.activity',
-                'id': 'nhc_activity_demo_placement_{0}_{1}'.format(
+                'id': 'nhc_activity_demo_news_{0}_{1}'.format(
                     patient.id, sequence)
             }
         )
@@ -180,7 +184,7 @@ class NewsGenerator(object):
             'field',
             {
                 'name': 'patient_id',
-                'ref': patient.patient_id
+                'ref': 'nh_clinical.' + patient.patient_id
             }
         )
 
@@ -271,7 +275,7 @@ class NewsGenerator(object):
             'field',
             {
                 'name': 'patient_id',
-                'ref': patient.patient_id
+                'ref': 'nh_clinical.' + patient.patient_id
             }
         )
 
@@ -281,7 +285,7 @@ class NewsGenerator(object):
             'field',
             {
                 'name': 'creator_id',
-                'ref': patient.placement_id
+                'ref': 'nh_clinical.' + patient.placement_id
             }
         )
 
@@ -291,7 +295,7 @@ class NewsGenerator(object):
             'field',
             {
                 'name': 'parent_id',
-                'ref': patient.spell_activity_id
+                'ref': 'nh_clinical.' + patient.spell_activity_id
             }
         )
 
@@ -301,7 +305,7 @@ class NewsGenerator(object):
             'field',
             {
                 'name': 'spell_activity_id',
-                'ref': patient.spell_activity_id
+                'ref': 'nh_clinical.' + patient.spell_activity_id
             }
         )
 
@@ -315,7 +319,7 @@ class NewsGenerator(object):
         activity_admit_model = SubElement(activity_news_record,
                                           'field',
                                           {'name': 'data_model'})
-        activity_admit_model.text = 'nh.clinical.patient.obervation.ews'
+        activity_admit_model.text = 'nh.clinical.patient.observation.ews'
 
         # Create location_id reference
         SubElement(
@@ -323,7 +327,7 @@ class NewsGenerator(object):
             'field',
             {
                 'name': 'location_id',
-                'ref': patient.bed_location_id
+                'ref': 'nh_clinical.' + patient.location_id
             }
         )
 
@@ -332,18 +336,18 @@ class NewsGenerator(object):
             activity_news_record,
             'field',
             {
-                'name': 'date_terminated',
-                'eval': patient.date_terminated
+                'name': 'date_scheduled',
+                'eval': date
             }
         )
 
         # Create activity date scheduled
-
-        SubElement(
-            activity_news_record,
-            'field',
-            {
-                'name': 'date_terminated',
-                'eval': date
-            }
-        )
+        if state == 'completed':
+            SubElement(
+                activity_news_record,
+                'field',
+                {
+                    'name': 'date_terminated',
+                    'eval': date
+                }
+            )

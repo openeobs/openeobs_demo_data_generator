@@ -12,7 +12,8 @@ from demo_data_generators.placements import PlacementsGenerator
 from demo_data_generators.pos import POSGenerator
 from demo_data_generators.spells import SpellsGenerator
 from demo_data_generators.users import UsersGenerator
-from demo_data_generators.ward_strategy import patients_factory, WardStrategy
+from demo_data_generators.ward_strategy import patients_factory, WardStrategy,\
+    get_hca_nurse_users
 from demo_data_generators.news import NewsGenerator
 
 
@@ -75,11 +76,13 @@ class DemoDataCoordinator(object):
 
             # set strategy parameters for ward
             news_patients = patients_factory(placements.root)
+            hca_nurse_ids = get_hca_nurse_users(users_per_ward_root)
             risk_distribution = {'high': 1, 'medium': 2, 'low': 10, 'none': 15}
             partial_news_per_patient = 1
             # Generate ward strategy here
             ward_strategy = WardStrategy(
-                news_patients, risk_distribution, partial_news_per_patient
+                news_patients, hca_nurse_ids, risk_distribution,
+                partial_news_per_patient
             )
 
             # NEWS demo data

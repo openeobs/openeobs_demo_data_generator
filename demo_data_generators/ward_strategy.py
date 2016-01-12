@@ -20,8 +20,10 @@ class Patient(object):
 
 class WardStrategy(object):
 
-    def __init__(self, patients, risk_distribution, partial_news_per_patient):
+    def __init__(self, patients, user_ids, risk_distribution,
+                 partial_news_per_patient):
         self.patients = patients
+        self.user_ids = user_ids
         self.risk_distribution = risk_distribution
         self.partial_news_per_patient = partial_news_per_patient
 
@@ -47,7 +49,7 @@ def patient_factory(placement, root):
     patient.placement_id = placement.attrib['id']
 
     for field in placement:
-        # append acitivty_id
+        # append activity_id
         if field.attrib['name'] == "activity_id":
             patient.activity_id = field.attrib['ref']
 
@@ -75,3 +77,31 @@ def patient_factory(placement, root):
 
     patient.set_id()
     return patient
+
+
+def get_hca_nurse_users(ward_users):
+    """Gets the nurse and hca ids for ward."""
+
+    users = ward_users.findall(".//record/[@model='res.users']")
+    user_ids = []
+    hca = "[(4, ref('nh_clinical.role_nhc_hca'))]"
+    nurse = "[(4, ref('nh_clinical.role_nhc_nurse'))]"
+
+    # get user_id if hca or nurse
+    for user in users:
+        user_id = user.attrib['id']
+        role = get_role(user)
+        if role == hca or role == nurse:
+            user_ids.append(user_id)
+
+    return user_ids
+
+
+def get_role(user):
+    """Gets the role of the user."""
+
+    role = None
+    for field in user:
+        if field.attrib['name'] == 'category_id':
+            role = field.attrib['eval']
+    return role

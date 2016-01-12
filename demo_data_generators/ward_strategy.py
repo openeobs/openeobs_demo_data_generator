@@ -20,6 +20,7 @@ class Patient(object):
 
 
 class WardStrategy(object):
+    """Determines the NEWS for a ward."""
 
     def __init__(self, patients, user_ids, risk_distribution,
                  partial_news_per_patient):

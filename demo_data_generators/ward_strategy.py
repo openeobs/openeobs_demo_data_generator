@@ -30,8 +30,7 @@ def patients_factory(root):
     """Returns a list of patients."""
 
     placements = root.findall(
-            ".//record/[@model='nh.clinical.patient.placement']"
-    )
+        ".//record/[@model='nh.clinical.patient.placement']")
     patients = []
 
     for placement in placements:
@@ -60,7 +59,7 @@ def patient_factory(placement, root):
                 for field in activity_record:
                     # get spell_activity_id
                     if field.attrib['name'] == 'spell_activity_id':
-                         patient.spell_activity_id = field.attrib['ref']
+                        patient.spell_activity_id = field.attrib['ref']
 
                     # get date_terminated
                     if field.attrib['name'] == 'date_terminated':
@@ -76,4 +75,3 @@ def patient_factory(placement, root):
 
     patient.set_id()
     return patient
-

@@ -79,27 +79,44 @@ class NewsGenerator(object):
                                      'timedelta(minutes={1}))' \
                                      '.strftime(\'%Y-%m-%d %H:%M:%S\')'
             schedule_date_eval = schedule_date_template.format(offset, minutes)
+
             # Generate observation data
             while self.to_be_completed(offset, minutes):
+
                 user_id = ward_strategy.pick_user_id()
-                self.generate_completed_news_data(
-                    patient, creator, user_id, schedule_date_eval, risk,
-                    sequence)
-                minutes += self.minutes[risk]
-                patient.date_terminated = schedule_date_eval
-                creator = 'nhc_activity_demo_news_{0}_{1}'.format(
-                    patient.id, sequence)
-                if self.to_be_completed(offset, minutes):
-                    self.generate_notification(
-                        patient, creator, schedule_date_eval, risk, sequence,
-                        'completed')
+
+                # determine whether obs will be partial
+                if sequence % 4 == 0:
+                    self.generate_partial_news_observation(
+                        patient, creator, user_id, schedule_date_eval, risk,
+                        sequence
+                    )
                 else:
-                    self.generate_notification(
-                        patient, creator, schedule_date_eval, risk, sequence,
-                        'scheduled')
+                    self.generate_completed_news_data(
+                        patient, creator, user_id, schedule_date_eval, risk,
+                        sequence
+                    )
+
+                    minutes += self.minutes[risk]
+                    patient.date_terminated = schedule_date_eval
+                    creator = 'nhc_activity_demo_news_{0}_{1}'.format(
+                        patient.id, sequence)
+
+                    if self.to_be_completed(offset, minutes):
+                        self.generate_notification(
+                            patient, creator, schedule_date_eval, risk,
+                            sequence, 'completed'
+                        )
+                    else:
+                        self.generate_notification(
+                            patient, creator, schedule_date_eval, risk,
+                            sequence, 'scheduled'
+                        )
+
                 sequence += 1
                 schedule_date_eval = schedule_date_template.format(
                     offset, minutes)
+
             self.generate_scheduled_news_data(
                 patient, creator, schedule_date_eval, sequence)
 
@@ -113,6 +130,20 @@ class NewsGenerator(object):
                     key] = ward_strategy.risk_distribution[key] - 1
                 return key
         return False
+
+    def generate_partial_news_observation(self, patient, creator, user_id,
+                                          schedule_date, sequence):
+        self.data.append(
+            Comment(
+                'NEWS data for patient {0}'.format(patient.patient_id)
+            )
+        )
+        # creates a completed observation
+        self.create_activity_news_record(
+            patient, creator, schedule_date, 'completed', sequence, user_id)
+        # creates a partial observation (i.e. missing parameters)
+        self.create_news_record(patient, 'partial', sequence)
+        self.update_activity_news(patient, sequence)
 
     def generate_completed_news_data(
             self, patient, creator, user_id, schedule_date, risk, sequence):

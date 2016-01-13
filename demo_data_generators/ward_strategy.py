@@ -23,11 +23,14 @@ class WardStrategy(object):
     """Determines the NEWS for a ward."""
 
     def __init__(self, patients, user_ids, risk_distribution,
-                 partial_news_per_patient):
+                 partial_news_per_patient, overdue_ratio,
+                 overdue_distribution):
         self.patients = patients
         self.user_ids = user_ids
         self.risk_distribution = risk_distribution
         self.partial_news_per_patient = partial_news_per_patient
+        self.overdue_ratio = overdue_ratio
+        self.overdue_distribution = overdue_distribution
 
     def pick_user_id(self):
         return random.choice(self.user_ids)

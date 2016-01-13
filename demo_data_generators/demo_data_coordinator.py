@@ -78,15 +78,35 @@ class DemoDataCoordinator(object):
             # Placements demo data
             placements = PlacementsGenerator(patients, offsets)
 
-            # set strategy parameters for ward
+            # Strategy
+            risk_distribution = {
+                'high': 0, 'medium': 2, 'low': 11, 'none': 15
+            }
+            # 50% observations are overdue by default
+            overdue_ratio = 0.5
+            # all overdue observations are within 30 mins overdue
+            overdue_distribution = [30]
+            if index == 0:
+                # ICU
+                risk_distribution = {
+                    'high': 3, 'medium': 4, 'low': 20, 'none': 1
+                }
+            elif index == 1:
+                # 75% observations are overdue, 1/3 overdue by 60 mins, the
+                # rest overdue by, at most, 30 mins
+                overdue_ratio = 0.75
+                overdue_distribution = [30, 30, 60]
+            elif index == 4:
+                # all observations are on-time
+                overdue_ratio = 0
+
             news_patients = patients_factory(placements.root)
             hca_nurse_ids = get_hca_nurse_users(users_per_ward_root)
-            risk_distribution = {'high': 1, 'medium': 2, 'low': 10, 'none': 15}
             partial_news_per_patient = 1
-            # Generate ward strategy here
+            # create ward strategy here
             ward_strategy = WardStrategy(
                 news_patients, hca_nurse_ids, risk_distribution,
-                partial_news_per_patient
+                partial_news_per_patient, overdue_ratio, overdue_distribution
             )
 
             # NEWS demo data

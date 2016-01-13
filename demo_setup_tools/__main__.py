@@ -24,11 +24,7 @@ def main():
     args = PARSER.parse_args()
     server = args.server
     database = args.database
-    user = args.user
-    password = args.password
-    days = args.days
     ReallocateWardManagers(server, database, 'oakley', 'oakley')
-    SubmitObservations(server, database, user, password, days)
     DischargeTransferCoordinator(server, database, 'adt', 'adt')
 
 

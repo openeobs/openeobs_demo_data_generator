@@ -195,7 +195,8 @@ class NewsGenerator(object):
         )
         # creates a completed observation
         self.create_activity_news_record(
-            patient, creator, schedule_date, schedule_date, 'completed', sequence, user_id)
+            patient, creator, schedule_date, schedule_date, 'completed',
+            sequence, user_id)
         # creates a partial observation
         self.create_partial_news_record(patient, risk, sequence)
         self.update_activity_news(patient, sequence)
@@ -541,16 +542,16 @@ class NewsGenerator(object):
 
         # Create activity state
         activity_news_state = SubElement(activity_news_record,
-                                          'field',
-                                          {'name': 'state'})
+                                         'field',
+                                         {'name': 'state'})
         activity_news_state.text = state
 
         # Create activity data model
         activity_news_model = SubElement(activity_news_record,
-                                          'field',
-                                          {'name': 'data_model'})
+                                         'field',
+                                         {'name': 'data_model'})
         activity_news_model.text = 'nh.clinical.patient.observation.ews'
-        
+
         # Create activity sequence
         SubElement(activity_news_record, 'field',
                    {'name': 'sequence', 'eval': str(self.act_seq)})
@@ -649,7 +650,7 @@ class NewsGenerator(object):
                 'ref': 'nh_clinical.' + patient.spell_activity_id
             }
         )
-        
+
         # Create activity sequence
         SubElement(activity_not_record, 'field',
                    {'name': 'sequence', 'eval': str(self.act_seq)})
@@ -657,20 +658,20 @@ class NewsGenerator(object):
 
         # Create activity state
         activity_not_state = SubElement(activity_not_record,
-                                          'field',
-                                          {'name': 'state'})
+                                        'field',
+                                        {'name': 'state'})
         activity_not_state.text = state
 
         # Create activity data model
         activity_not_model = SubElement(activity_not_record,
-                                          'field',
-                                          {'name': 'data_model'})
+                                        'field',
+                                        {'name': 'data_model'})
         activity_not_model.text = model
 
         # Create activity summary
         activity_not_model = SubElement(activity_not_record,
-                                          'field',
-                                          {'name': 'summary'})
+                                        'field',
+                                        {'name': 'summary'})
         activity_not_model.text = title
 
         # Create location_id reference

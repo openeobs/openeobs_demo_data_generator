@@ -86,7 +86,7 @@ class NewsGenerator(object):
                 user_id = ward_strategy.pick_user_id()
 
                 # determine whether obs will be partial
-                if sequence % 4 == 0:
+                if sequence % 10 == 0:
                     self.generate_partial_news_observation(
                         patient, creator, user_id, schedule_date_eval, risk,
                         sequence

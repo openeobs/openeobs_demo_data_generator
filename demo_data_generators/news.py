@@ -1,6 +1,7 @@
 # pylint: disable=C0103
 """Generates NEWS Observations"""
 from xml.etree.ElementTree import Element, SubElement, Comment
+import random
 
 
 class NewsGenerator(object):
@@ -12,7 +13,13 @@ class NewsGenerator(object):
 
         # Create data inside root element
         self.data = SubElement(self.root, 'data', {'noupdate': '1'})
+        self.act_seq = 1
 
+        self.increasing_risk = ['none', 'low', 'medium', 'high']
+        self.decreasing_risk = ['high', 'medium', 'low', 'none']
+        self.starting_risk = {
+            'high': 'none', 'medium': 'none', 'low': 'high', 'none': 'high'
+        }
         self.minutes = {
             'high': 30, 'medium': 60, 'low': 240, 'none': 720
         }
@@ -32,8 +39,8 @@ class NewsGenerator(object):
                 'indirect_oxymetry_spo2': '95',
                 'oxygen_administration_flag': 'False',
                 'body_temperature': '40.5',
-                'blood_pressure_systolic': '120',
-                'blood_pressure_diastolic': '80',
+                'blood_pressure_systolic': '94',
+                'blood_pressure_diastolic': '60',
                 'pulse_rate': '65',
                 'avpu_text': 'A'
             },
@@ -69,20 +76,21 @@ class NewsGenerator(object):
         :return:
         """
         for patient in ward_strategy.patients:
-            risk = self.get_risk(ward_strategy)
+            final_risk = self.get_risk(ward_strategy)
+            risk = self.starting_risk[final_risk]
             offset_position = patient.date_terminated.find('timedelta(-') + 11
             offset = int(patient.date_terminated[offset_position])
             creator = 'nh_clinical.' + patient.placement_id
             minutes = 60
             sequence = 0
-            schedule_date_template = '(datetime.now() + timedelta(-{0}) + ' \
-                                     'timedelta(minutes={1}))' \
-                                     '.strftime(\'%Y-%m-%d %H:%M:%S\')'
-            schedule_date_eval = schedule_date_template.format(offset, minutes)
+            date_template = '(datetime.now() + timedelta(-{0}) + ' \
+                            'timedelta(minutes={1}))' \
+                            '.strftime(\'%Y-%m-%d %H:%M:%S\')'
+            schedule_date_eval = date_template.format(offset, minutes)
+            complete_date_eval = date_template.format(offset, minutes)
 
             # Generate observation data
             while self.to_be_completed(offset, minutes):
-
                 user_id = ward_strategy.pick_user_id()
 
                 # determine whether obs will be partial
@@ -93,8 +101,8 @@ class NewsGenerator(object):
                     )
                 else:
                     self.generate_completed_news_data(
-                        patient, creator, user_id, schedule_date_eval, risk,
-                        sequence
+                        patient, creator, user_id, schedule_date_eval,
+                        complete_date_eval, risk, sequence
                     )
 
                     minutes += self.minutes[risk]
@@ -112,10 +120,18 @@ class NewsGenerator(object):
                             patient, creator, schedule_date_eval, risk,
                             sequence, 'scheduled'
                         )
-
+                    if final_risk in ['medium', 'high']:
+                        risk = self.pick_next_risk_increasing(
+                            offset, minutes, risk, final_risk)
+                    else:
+                        risk = self.pick_next_risk_decreasing(
+                            offset, minutes, risk, final_risk)
+                    schedule_date_eval = date_template.format(offset, minutes)
+                    if self.is_overdue(ward_strategy.overdue_ratio):
+                        minutes += random.choice(
+                            ward_strategy.overdue_distribution)
+                    complete_date_eval = date_template.format(offset, minutes)
                 sequence += 1
-                schedule_date_eval = schedule_date_template.format(
-                    offset, minutes)
 
             self.generate_scheduled_news_data(
                 patient, creator, schedule_date_eval, sequence)
@@ -131,6 +147,45 @@ class NewsGenerator(object):
                 return key
         return False
 
+    def is_overdue(self, ratio):
+        choices = [True]*int(ratio*100) + [False]*int(100 - ratio*100)
+        return random.choice(choices)
+
+    def pick_next_risk_increasing(
+            self, offset, minutes, current_risk, final_risk):
+        if self.to_be_completed(offset, minutes+self.minutes[current_risk]):
+            return current_risk
+        else:
+            if current_risk == final_risk:
+                return current_risk
+            else:
+                return self.pick_next_risk_increasing(
+                    offset, minutes,
+                    self.increasing_risk[
+                        self.increasing_risk.index(current_risk)+1],
+                    final_risk)
+
+    def pick_next_risk_decreasing(
+            self, offset, minutes, current_risk, final_risk):
+        if current_risk == 'high':
+            if minutes < 240:
+                return current_risk
+            else:
+                return 'medium'
+        elif current_risk == 'medium':
+            if minutes < 480:
+                return current_risk
+            else:
+                return 'low'
+        elif current_risk == 'low':
+            if final_risk == 'low':
+                return final_risk
+            if self.to_be_completed(
+                    offset, minutes+self.minutes[current_risk]):
+                return current_risk
+            else:
+                return 'none'
+
     def generate_partial_news_observation(self, patient, creator, user_id,
                                           schedule_date, risk, sequence):
         self.data.append(
@@ -140,20 +195,22 @@ class NewsGenerator(object):
         )
         # creates a completed observation
         self.create_activity_news_record(
-            patient, creator, schedule_date, 'completed', sequence, user_id)
+            patient, creator, schedule_date, schedule_date, 'completed', sequence, user_id)
         # creates a partial observation
         self.create_partial_news_record(patient, risk, sequence)
         self.update_activity_news(patient, sequence)
 
     def generate_completed_news_data(
-            self, patient, creator, user_id, schedule_date, risk, sequence):
+            self, patient, creator, user_id, schedule_date, complete_date,
+            risk, sequence):
         self.data.append(
             Comment(
                 'NEWS data for patient {0}'.format(patient.patient_id)
             )
         )
         self.create_activity_news_record(
-            patient, creator, schedule_date, 'completed', sequence, user_id)
+            patient, creator, schedule_date, complete_date, 'completed',
+            sequence, user_id)
         self.create_news_record(patient, risk, sequence)
         self.update_activity_news(patient, sequence)
 
@@ -165,7 +222,7 @@ class NewsGenerator(object):
             )
         )
         self.create_activity_news_record(
-            patient, creator, schedule_date, 'scheduled', sequence)
+            patient, creator, schedule_date, '', 'scheduled', sequence)
         self.create_news_record(patient, 'partial', sequence)
         self.update_activity_news(patient, sequence)
 
@@ -427,7 +484,8 @@ class NewsGenerator(object):
             avpu.text = self.values[risk]['avpu_text']
 
     def create_activity_news_record(
-            self, patient, creator, date, state, sequence, user_id=False):
+            self, patient, creator, date, complete_date, state, sequence,
+            user_id=False):
         """Create activity NEWS record"""
 
         # Create nh.activity NEWS record with id
@@ -482,16 +540,21 @@ class NewsGenerator(object):
         )
 
         # Create activity state
-        activity_admit_state = SubElement(activity_news_record,
+        activity_news_state = SubElement(activity_news_record,
                                           'field',
                                           {'name': 'state'})
-        activity_admit_state.text = state
+        activity_news_state.text = state
 
         # Create activity data model
-        activity_admit_model = SubElement(activity_news_record,
+        activity_news_model = SubElement(activity_news_record,
                                           'field',
                                           {'name': 'data_model'})
-        activity_admit_model.text = 'nh.clinical.patient.observation.ews'
+        activity_news_model.text = 'nh.clinical.patient.observation.ews'
+        
+        # Create activity sequence
+        SubElement(activity_news_record, 'field',
+                   {'name': 'sequence', 'eval': str(self.act_seq)})
+        self.act_seq += 1
 
         # Create location_id reference
         SubElement(
@@ -503,7 +566,7 @@ class NewsGenerator(object):
             }
         )
 
-        # Create activity date terminated
+        # Create activity date scheduled
         SubElement(
             activity_news_record,
             'field',
@@ -513,14 +576,14 @@ class NewsGenerator(object):
             }
         )
 
-        # Create activity date scheduled
+        # Create activity date terminated
         if state == 'completed':
             SubElement(
                 activity_news_record,
                 'field',
                 {
                     'name': 'date_terminated',
-                    'eval': date
+                    'eval': complete_date
                 }
             )
             SubElement(
@@ -528,7 +591,7 @@ class NewsGenerator(object):
                 'field',
                 {
                     'name': 'terminate_uid',
-                    'ref': user_id
+                    'ref': 'nh_clinical.' + str(user_id)
                 }
             )
 
@@ -586,24 +649,29 @@ class NewsGenerator(object):
                 'ref': 'nh_clinical.' + patient.spell_activity_id
             }
         )
+        
+        # Create activity sequence
+        SubElement(activity_not_record, 'field',
+                   {'name': 'sequence', 'eval': str(self.act_seq)})
+        self.act_seq += 1
 
         # Create activity state
-        activity_admit_state = SubElement(activity_not_record,
+        activity_not_state = SubElement(activity_not_record,
                                           'field',
                                           {'name': 'state'})
-        activity_admit_state.text = state
+        activity_not_state.text = state
 
         # Create activity data model
-        activity_admit_model = SubElement(activity_not_record,
+        activity_not_model = SubElement(activity_not_record,
                                           'field',
                                           {'name': 'data_model'})
-        activity_admit_model.text = model
+        activity_not_model.text = model
 
         # Create activity summary
-        activity_admit_model = SubElement(activity_not_record,
+        activity_not_model = SubElement(activity_not_record,
                                           'field',
                                           {'name': 'summary'})
-        activity_admit_model.text = title
+        activity_not_model.text = title
 
         # Create location_id reference
         SubElement(

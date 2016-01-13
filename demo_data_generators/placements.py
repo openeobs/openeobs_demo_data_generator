@@ -26,8 +26,10 @@ class PlacementsGenerator(object):
         # Regex to use to get the ID for a patient from id attribute on record
         patient_id_regex_string = r'nhc_demo_patient_(\d+)'
         ward_regex_string = r'(nhc_def_conf_location_w\w)'
+        bed_regex_string = r'(nhc_def_conf_location_w\w_b(\d+))'
         self.patient_id_regex = re.compile(patient_id_regex_string)
         self.ward_regex = re.compile(ward_regex_string)
+        self.bed_regex = re.compile(bed_regex_string)
 
         # Generate the patient admissions
         self.admit_patients()
@@ -37,7 +39,12 @@ class PlacementsGenerator(object):
         ward_location = re.match(self.ward_regex, bed_string)
         return ward_location.groups()[0]
 
-    def generate_placement_data(self, patient_id, patient, admit_offset):
+    def is_bed(self, location_string):
+        """Tells us if the location is a bed"""
+        return bool(re.search(self.bed_regex, location_string))
+
+    def generate_placement_data(
+            self, patient_id, patient, admit_offset, state):
         """Generate placement data"""
         self.data.append(
             Comment(
@@ -45,7 +52,7 @@ class PlacementsGenerator(object):
             )
         )
         self.create_activity_placement_record(patient_id, patient,
-                                              admit_offset)
+                                              admit_offset, state)
         self.create_placement_record(patient_id, patient)
         self.update_activity_placement(patient_id)
 
@@ -76,13 +83,16 @@ class PlacementsGenerator(object):
             location = location_el.attrib['ref']
             if '_b' in location[-6:]:
                 self.generate_placement_data(
-                    patient_id, patient, self.offsets[i])
+                    patient_id, patient, self.offsets[i], 'completed')
                 self.generate_placement_movement_data(patient_id, patient,
                                                       self.offsets[i])
+            else:
+                self.generate_placement_data(
+                    patient_id, patient, self.offsets[i], 'scheduled')
             i += 1
 
     def create_activity_placement_record(self, patient_id, patient,
-                                         admit_offset):
+                                         admit_offset, state):
         """Create activity placement record"""
 
         # Create nh.activity ADT admission record with id
@@ -139,7 +149,7 @@ class PlacementsGenerator(object):
         activity_admit_state = SubElement(activity_admit_record,
                                           'field',
                                           {'name': 'state'})
-        activity_admit_state.text = 'completed'
+        activity_admit_state.text = state
 
         # Create activity data model
         activity_admit_model = SubElement(activity_admit_record,
@@ -159,15 +169,16 @@ class PlacementsGenerator(object):
             }
         )
 
-        # Create activity date terminated
-        SubElement(
-            activity_admit_record,
-            'field',
-            {
-                'name': 'date_terminated',
-                'eval': self.admit_date_eval_string.format(admit_offset)
-            }
-        )
+        if state == 'completed':
+            # Create activity date terminated
+            SubElement(
+                activity_admit_record,
+                'field',
+                {
+                    'name': 'date_terminated',
+                    'eval': self.admit_date_eval_string.format(admit_offset)
+                }
+            )
 
     def create_placement_record(self, patient_id, patient):
         """Create placement record"""
@@ -205,22 +216,22 @@ class PlacementsGenerator(object):
         # Create parent_id reference
         location = patient.find('field[@name=\'current_location_id\']')\
             .attrib['ref']
+        if self.is_bed(location):
+            # Create pos / hospital reference
+            SubElement(
+                activity_admit_record,
+                'field',
+                {
+                    'name': 'location_id',
+                    'ref': location
+                }
+            )
         SubElement(
             activity_admit_record,
             'field',
             {
                 'name': 'suggested_location_id',
                 'ref': self.remove_bed(location)
-            }
-        )
-
-        # Create pos / hospital reference
-        SubElement(
-            activity_admit_record,
-            'field',
-            {
-                'name': 'location_id',
-                'ref': location
             }
         )
 

@@ -44,6 +44,8 @@ def patients_factory(root):
     patients = []
 
     for placement in placements:
+        if not placement.findall(".//field[@name='location_id']"):
+            continue
         patient = patient_factory(placement, root)
         patients.append(patient)
 

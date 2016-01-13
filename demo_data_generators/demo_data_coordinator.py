@@ -96,9 +96,15 @@ class DemoDataCoordinator(object):
                 # rest overdue by, at most, 30 mins
                 overdue_ratio = 0.75
                 overdue_distribution = [30, 30, 60]
+                risk_distribution = {
+                    'high': 0, 'medium': 0, 'low': 20, 'none': 8
+                }
             elif index == 4:
                 # all observations are on-time
                 overdue_ratio = 0
+                risk_distribution = {
+                    'high': 0, 'medium': 0, 'low': 0, 'none': 28
+                }
 
             news_patients = patients_factory(placements.root)
             hca_nurse_ids = get_hca_nurse_users(users_per_ward_root)

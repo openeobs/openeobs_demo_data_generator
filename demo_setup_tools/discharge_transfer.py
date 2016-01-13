@@ -48,7 +48,7 @@ class DischargePatients(object):
         self.client = client
         self.discharge_patients(discharge_ward, patients_to_affect)
 
-    def discharge_patient(self, ward, patients):
+    def discharge_patients(self, ward, patients):
         api_demo = self.client.model('nh.eobs.demo.loader')
         api_demo.discharge_patients(ward, patients)
 

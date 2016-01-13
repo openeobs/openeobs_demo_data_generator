@@ -22,7 +22,8 @@ class TestWardStrategy(unittest.TestCase):
         self.patients = patients_factory(self.gen.root)
         risk = {'high': 1, 'medium': 2, 'low': 10, 'none': 15}
         self.user_ids = ['user_1', 'user_2']
-        self.strategy = WardStrategy(self.patients, self.user_ids, risk, 1)
+        self.strategy = WardStrategy(self.patients, self.user_ids, risk, 1, 1,
+                                     [30])
 
     def test_pick_user_id(self):
         user_id = self.strategy.pick_user_id()

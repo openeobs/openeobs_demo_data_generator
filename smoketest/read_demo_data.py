@@ -18,6 +18,47 @@ def get_erppeek_client(server='http://localhost:8069', db='data_demo_test',
     return client
 
 
+class MobileSmokeTest(unittest.TestCase):
+
+    SERVER = 'http://localhost:8069'
+    DATABASE = 'nhclinical'
+    USER = 'waino'
+    PASSWORD = 'waino'
+
+    def setUp(self):
+        self.client = get_erppeek_client(server=self.SERVER,
+                                    db=self.DATABASE, user=self.USER,
+                                    password=self.PASSWORD)
+        self.api_pool = self.client.model('nh.eobs.api')
+
+    def test_task_list(self):
+        assigned_activities = self.api_pool.get_assigned_activities(
+            activity_type='nh.clinical.patient.follow'
+        )
+        self.assertTrue(len(assigned_activities) > 0)
+
+    def test_patient_list_contains_following_notifications(self):
+        self.api_pool.unassign_my_activities()
+        follow_activities = self.api_pool.get_assigned_activities()
+        self.assertTrue(len(follow_activities) > 0)
+
+    def test_patient_list_contains_following_patients(self):
+        patients = self.api_pool.get_patients([])
+        self.assertEqual(patients, '')
+        following_patients = self.api_pool.get_followed_patients()
+        self.assertTrue(len(following_patients) > 0)
+
+    def test_patient_follow(self):
+        follow_pool = self.client.model('nh.clinical.patient.follow')
+        followed_ids = follow_pool.search([])
+        self.assertTrue(len(followed_ids) > 0)
+
+    def test_there_are_follow_activities(self):
+        activity_pool = self.client.model('nh.activity')
+        activity_ids = activity_pool.search([('data_model', '=', 'nh.clinical.patient.follow')])
+        self.assertTrue(len(activity_ids) > 0)
+
+
 class UsersSmokeTest(unittest.TestCase):
 
     SERVER = 'http://localhost:8069'

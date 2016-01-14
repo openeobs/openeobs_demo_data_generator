@@ -29,17 +29,19 @@ class DischargeTransferCoordinator(object):
         client = get_erppeek_client(server=server, db=database, user=user,
                                     password=password)
 
-        DischargePatients(client, 'A', 4)
-        DischargePatients(client, 'B', 4)
-        DischargePatients(client, 'C', 4)
-        DischargePatients(client, 'D', 4)
-        DischargePatients(client, 'E', 4)
+        # go two-by-two as ward already has 28 patients placed (max 30)
+        for i in range(2):
+            DischargePatients(client, 'A', 2)
+            DischargePatients(client, 'B', 2)
+            DischargePatients(client, 'C', 2)
+            DischargePatients(client, 'D', 2)
+            DischargePatients(client, 'E', 2)
 
-        TransferPatients(client, 'A', 'B', 4)
-        TransferPatients(client, 'B', 'C', 4)
-        TransferPatients(client, 'C', 'D', 4)
-        TransferPatients(client, 'D', 'E', 4)
-        TransferPatients(client, 'E', 'A', 4)
+            TransferPatients(client, 'A', 'B', 2)
+            TransferPatients(client, 'B', 'C', 2)
+            TransferPatients(client, 'C', 'D', 2)
+            TransferPatients(client, 'D', 'E', 2)
+            TransferPatients(client, 'E', 'A', 2)
 
 
 class DischargePatients(object):

@@ -2,8 +2,8 @@ import erppeek
 import unittest
 
 
-def get_erppeek_client(server='http://localhost:8069', db='openerp',
-                       user='admin', password='admin'):
+def get_erppeek_client(server='http://localhost:8069', db='data_demo_test',
+                       user='adt', password='adt'):
     """
     Get a ERPPeek client for us to use, if one not available then close the
     function
@@ -21,9 +21,9 @@ def get_erppeek_client(server='http://localhost:8069', db='openerp',
 class UsersSmokeTest(unittest.TestCase):
 
     SERVER = 'http://localhost:8069'
-    DATABASE = 'nhclinical'
-    USER = 'admin'
-    PASSWORD = 'admin'
+    DATABASE = 'demo_data_test'
+    USER = 'adt'
+    PASSWORD = 'adt'
 
     def setUp(self):
         self.client = get_erppeek_client(server=self.SERVER,
@@ -48,13 +48,11 @@ class UsersSmokeTest(unittest.TestCase):
                                        'users')
         self.senior_managers = len(self.senior_ids[0])
 
-        self.kiosk_ids = self.client.read('res.groups', [('name', '=', 'NH Clinical Kiosk Group')],
+        self.kiosk_ids = self.client.read('res.groups',
+                                          [('name', '=',
+                                            'NH Clinical Kiosk Group')],
                                        'users')
         self.kiosks = len(self.kiosk_ids[0])
-        #print(self.kiosk_ids)
-      #  for kiosk in self.kiosk_ids:
-          #  self.kiosks.append(kiosk['users'])
-            #print(self.kiosks)
 
         self.wards = self.client.read('nh.clinical.location',
                                         [('usage', '=', 'ward')])
@@ -96,51 +94,87 @@ class UsersSmokeTest(unittest.TestCase):
                         self.patients_in_bed += 1
             self.list_patients_in_bed.append(self.patients_in_bed)
 
+
     def test_hospital_name(self):
+        """Asserts that the hospital name is correct"""
         self.assertEqual(self.hospital, 'Greenfield University Hospital',
                          'Incorrect hospital name')
 
     def test_senior_managers(self):
+        """Asserts that there are the correct amount of senior managers"""
         self.assertEqual(self.senior_managers, 3,
                          'Incorrect amount of managers')
 
     def test_wards(self):
+        """Asserts that there are 5 wards, named A-E respectively"""
         self.assertEqual(self.ward_names,
                          ['Ward A','Ward B','Ward C','Ward D','Ward E'],
                          'Incorrect ward names')
 
     def test_total_patients(self):
+        """Asserts that the wards have a total of 200 patients"""
         self.assertEqual(self.patients, 200, 'Incorrect total of patients')
 
     def test_ward_patients(self):
+        """Asserts that there are 40 patients in each ward"""
         for ward in self.wards:
             self.assertEqual(len(ward['patient_ids']), 40,
                                  'Incorrect amount of patients in ward ' + ward['name'])
 
     def test_ward_nurses(self):
+        """Asserts that there are 10 nurses in each ward"""
         for ward in self.wards:
             for list in self.nurse_list:
                 self.assertEqual(len(list), 10, 'Incorrect number of nurses in ' + ward['name'])
 
     def test_ward_doctors(self):
+        """Asserts that there are 4 doctors in each ward"""
         for ward in self.doctor_list:
             self.assertEqual(len(ward), 4, 'Incorrect number of doctors')
 
     def test_ward_hcas(self):
+        """Asserts that there are 10 hcas in each ward"""
         for hca in self.hca_list:
             self.assertEqual(hca, 10, 'Incorrect number of hcas')
 
     def test_beds(self):
+        """Asserts that there are 30 beds in each ward"""
         for beds in self.bed_total:
             self.assertEqual(beds, 30, 'Incorrect number of beds')
 
     def test_patients_in_bed(self):
+        """Asserts that there are 28 patients in a bed, in each ward"""
         for ward in self.list_patients_in_bed:
             self.assertEqual(ward, 28, 'Incorrect number of patients in bed')
 
     def test_kiosks(self):
+        """Asserts that there are the correct number of kiosks"""
         self.assertEqual(self.kiosks, 5, 'Incorrect number of kiosks')
 
+    def test_discharge_patient(self):
+        """Asserts that a patient is removed from a ward after being discharged"""
+
+        """Needs fixing"""
+        original_total = len(self.wards[0]['patient_ids'])
+
+        try_discharge = self.client.model('nh.eobs.demo.loader')
+        try_discharge.discharge_patients('A', 1)
+
+        new_total = len(self.wards[0]['patient_ids'])
+
+        self.assertEqual(new_total, self.original_total-1, 'Incorrect number of discharges')
+
+    #def test_transfer_patient(self):
+     #   """Asserts that a patient is added to a ward after being transferred"""
+
+      #  """Needs fixing"""
+       # old_total = len(self.wards[1]['patient_ids'])
+#
+ #       try_transfer = self.client.model('nh.eobs.demo.loader')
+  #      try_transfer.transfer_patients('A', 'B', 1)
+
+   #     new_total = len(self.wards[1]['patient_ids'])
+    #    self.assertEqual(new_total, old_total+1, 'Incorrect number of transfers')
 
 if __name__ == '__main__':
     unittest.main()

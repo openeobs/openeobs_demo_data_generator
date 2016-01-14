@@ -81,7 +81,7 @@ class NewsGenerator(object):
             offset_position = patient.date_terminated.find('timedelta(-') + 11
             offset = int(patient.date_terminated[offset_position])
             creator = 'nh_clinical.' + patient.placement_id
-            minutes = 60
+            minutes = 15
             sequence = 0
             date_template = '(datetime.now() + timedelta(-{0}) + ' \
                             'timedelta(minutes={1}))' \
@@ -132,9 +132,8 @@ class NewsGenerator(object):
                             ward_strategy.overdue_distribution)
                     complete_date_eval = date_template.format(offset, minutes)
                 sequence += 1
-
             self.generate_scheduled_news_data(
-                patient, creator, schedule_date_eval, sequence)
+                patient, creator, schedule_date_eval, risk, sequence)
 
     def to_be_completed(self, offset, minutes):
         return float(minutes)/(24*60) < offset
@@ -185,6 +184,8 @@ class NewsGenerator(object):
                 return current_risk
             else:
                 return 'none'
+        else:
+            return 'none'
 
     def generate_partial_news_observation(self, patient, creator, user_id,
                                           schedule_date, risk, sequence):
@@ -212,11 +213,11 @@ class NewsGenerator(object):
         self.create_activity_news_record(
             patient, creator, schedule_date, complete_date, 'completed',
             sequence, user_id)
-        self.create_news_record(patient, risk, sequence)
+        self.create_news_record(patient, risk, True, sequence)
         self.update_activity_news(patient, sequence)
 
     def generate_scheduled_news_data(
-            self, patient, creator, schedule_date, sequence):
+            self, patient, creator, schedule_date, risk, sequence):
         self.data.append(
             Comment(
                 'NEWS data for patient {0}'.format(patient.patient_id)
@@ -224,7 +225,7 @@ class NewsGenerator(object):
         )
         self.create_activity_news_record(
             patient, creator, schedule_date, '', 'scheduled', sequence)
-        self.create_news_record(patient, 'partial', sequence)
+        self.create_news_record(patient, risk, False, sequence)
         self.update_activity_news(patient, sequence)
 
     def generate_notification(
@@ -329,6 +330,14 @@ class NewsGenerator(object):
             news_record,
             'field',
             {
+                'name': 'frequency',
+                'eval': str(self.minutes[risk])
+            }
+        )
+        SubElement(
+            news_record,
+            'field',
+            {
                 'name': 'respiration_rate',
                 'eval': self.values[risk]['respiration_rate']
             }
@@ -382,7 +391,7 @@ class NewsGenerator(object):
         )
         avpu.text = self.values[risk]['avpu_text']
 
-    def create_news_record(self, patient, risk, sequence):
+    def create_news_record(self, patient, risk, complete, sequence):
         """Create NEWS record"""
 
         # Create nh.activity NEWS record with id
@@ -418,7 +427,15 @@ class NewsGenerator(object):
         )
 
         # Create observation data
-        if risk != 'partial':
+        SubElement(
+            news_record,
+            'field',
+            {
+                'name': 'frequency',
+                'eval': str(self.minutes[risk])
+            }
+        )
+        if complete:
             SubElement(
                 news_record,
                 'field',

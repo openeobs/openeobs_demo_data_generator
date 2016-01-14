@@ -8,16 +8,17 @@ PARSER.add_argument('database', type=str,
                     default='nhclinical')
 PARSER.add_argument('--password', type=str,
                     help='Password for user')
-PARSER.add_argument('--dbpassword', type=str,
-                    help='Password for user')
+PARSER.add_argument('--server', type=str,
+                    help='Server to change password for',
+                    default='http://localhost:8069')
 
 
 def main():
     args = PARSER.parse_args()
+    server = args.server
     database = args.database
     new_password = args.password
-    admin_password = args.dbpassword
-    ChangeAdminPassword(database, new_password, admin_password)
+    ChangeAdminPassword(server, db=database, pwd=new_password)
 
 
 if __name__ == '__main__':

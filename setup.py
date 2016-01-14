@@ -25,9 +25,7 @@ setup(
     },
     install_requires=[
         'ERPPeek==1.6.1',
-        'argparse>=1.2.1',
-        'passlib',
-        'psycopg2'
+        'argparse>=1.2.1'
     ],
     license="GPL",
     zip_safe=True,

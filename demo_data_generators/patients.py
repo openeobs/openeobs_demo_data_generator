@@ -65,7 +65,9 @@ class PatientsGenerator(object):
 
             # create DOB field with fake data
             dob_field = SubElement(record, 'field', {'name': 'dob'})
-            dob_field.text = '{0} 00:00:00'.format(self.data_generator.date())
+            dob_field.text = '{0}'.format(
+                self.data_generator.date_time_between(
+                    start_date="-90y", end_date="-18y"))
 
             # Create Gender / Sex fields with fake data
             gender_sex = random.choice(self.gender_sex_list)

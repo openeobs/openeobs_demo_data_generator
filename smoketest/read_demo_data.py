@@ -21,7 +21,7 @@ def get_erppeek_client(server='http://localhost:8069', db='data_demo_test',
 class UsersSmokeTest(unittest.TestCase):
 
     SERVER = 'http://localhost:8069'
-    DATABASE = 'demo_data_test'
+    DATABASE = 'data_demo_test'
     USER = 'adt'
     PASSWORD = 'adt'
 
@@ -56,13 +56,17 @@ class UsersSmokeTest(unittest.TestCase):
 
         self.wards = self.client.read('nh.clinical.location',
                                         [('usage', '=', 'ward')])
+
+        patients = self.client.model('nh.clinical.patient')
+        self.patients = patients.search()
+
         self.ward_names = []
         for ward in self.wards:
               self.ward_names.append(ward['name'])
 
-        self.patients = 0
+        self.patients_in_ward = 0
         for ward in self.wards:
-            self.patients += len(ward['patient_ids'])
+            self.patients_in_ward += len(ward['patient_ids'])
 
         self.nurse_list = []
         for ward in self.wards:
@@ -76,7 +80,8 @@ class UsersSmokeTest(unittest.TestCase):
         for ward in self.wards:
             self.hca_list.append(ward['related_hcas'])
 
-        self.beds = self.client.read('nh.clinical.location', [('usage', '=', 'bed')])
+        self.beds = self.client.read('nh.clinical.location',
+                                     [('usage', '=', 'bed')])
         self.bed_total = []
         for ward in self.wards:
             self.bed_list = []
@@ -108,18 +113,17 @@ class UsersSmokeTest(unittest.TestCase):
     def test_wards(self):
         """Asserts that there are 5 wards, named A-E respectively"""
         self.assertEqual(self.ward_names,
-                         ['Ward A','Ward B','Ward C','Ward D','Ward E'],
+                         ['Ward A', 'Ward B', 'Ward C', 'Ward D', 'Ward E'],
                          'Incorrect ward names')
 
-    def test_total_patients(self):
-        """Asserts that the wards have a total of 200 patients"""
-        self.assertEqual(self.patients, 200, 'Incorrect total of patients')
+    def test_total_patients_in_ward(self):
+        """Asserts that the wards have a total of 180 patients"""
+        self.assertEqual(self.patients_in_ward, 180,
+                         'Incorrect total of patients in ward')
 
-    def test_ward_patients(self):
+    def test_total_patients(self):
         """Asserts that there are 40 patients in each ward"""
-        for ward in self.wards:
-            self.assertEqual(len(ward['patient_ids']), 40,
-                                 'Incorrect amount of patients in ward ' + ward['name'])
+        self.assertEqual(self.patients, 200, 'Incorrect total of patients')
 
     def test_ward_nurses(self):
         """Asserts that there are 10 nurses in each ward"""
@@ -151,30 +155,20 @@ class UsersSmokeTest(unittest.TestCase):
         """Asserts that there are the correct number of kiosks"""
         self.assertEqual(self.kiosks, 5, 'Incorrect number of kiosks')
 
-    def test_discharge_patient(self):
-        """Asserts that a patient is removed from a ward after being discharged"""
+    def test_discharged_patients(self):
+        """Asserts there are 20 discharged patients"""
+        location = self.client.model('nh.clinical.location')
+        discharge_location_id = location.search([('code', '=', 'DISL-GUH')])
+        patient = self.client.model('nh.clinical.patient')
+        dicharged_patients_ids = patient.search(
+            [('current_location_id', '=', discharge_location_id)]
+        )
 
-        """Needs fixing"""
-        original_total = len(self.wards[0]['patient_ids'])
+        self.assertEqual(len(dicharged_patients_ids), 20)
 
-        try_discharge = self.client.model('nh.eobs.demo.loader')
-        try_discharge.discharge_patients('A', 1)
+    def test_transferred_patients(self):
+        pass
 
-        new_total = len(self.wards[0]['patient_ids'])
-
-        self.assertEqual(new_total, self.original_total-1, 'Incorrect number of discharges')
-
-    #def test_transfer_patient(self):
-     #   """Asserts that a patient is added to a ward after being transferred"""
-
-      #  """Needs fixing"""
-       # old_total = len(self.wards[1]['patient_ids'])
-#
- #       try_transfer = self.client.model('nh.eobs.demo.loader')
-  #      try_transfer.transfer_patients('A', 'B', 1)
-
-   #     new_total = len(self.wards[1]['patient_ids'])
-    #    self.assertEqual(new_total, old_total+1, 'Incorrect number of transfers')
 
 if __name__ == '__main__':
     unittest.main()

@@ -24,33 +24,54 @@ def get_erppeek_client(server='http://localhost:8069', db='openerp',
     return client
 
 
-class ReallocateWardManagers(object):
+class ReallocateUsersToWards(object):
+    """
+    Reallocate users belonging to groups whose users are assigned to wards.
+
+    Such groups are stored in a class attribute, to be easily referenced from
+    inside the class' methods.
+    """
 
     def __init__(self, server, db, user='admin', password='admin'):
-        client = get_erppeek_client(server=server, db=db, user=user,
+        self.user_model = 'res.users'
+        self.groups_model = 'res.groups'
+        self.user_management = 'nh.clinical.user.management'
+        self.client = get_erppeek_client(server=server, db=db, user=user,
                                          password=password)
-        user_model = 'res.users'
-        user_management = 'nh.clinical.user.management'
-        groups_model = 'res.groups'
         resp_model = 'nh.clinical.user.responsibility.allocation'
+        self.resp = self.client.model(resp_model)
+        self.groups_list = [
+            'NH Clinical Senior Manager Group',
+            'NH Clinical Ward Manager Group',
+            'NH Clinical Doctor Group',
+        ]
 
-        wm_group = client.search(
-            groups_model, [['name', '=', 'NH Clinical Ward Manager Group']]
+    def reallocate_users_by_group(self, group_name):
+        """
+        Reallocate users belonging to a specific group, passed as argument.
+
+        :param group_name: name of the group
+        :type group_name: str
+        """
+        group = self.client.search(
+            self.groups_model, [['name', '=', group_name]]
         )
-
-        users = client.search(
-            user_model,
+        users = self.client.search(
+            self.user_model,
             [
                 ['pos_id', '!=', None],
-                ['groups_id', 'in', wm_group]
+                ['groups_id', 'in', group]
             ]
         )
-
-        resp = client.model(resp_model)
         for user in users:
-            current_foo = client.read(user_management, user, ['ward_ids'])['ward_ids']
-            resp_act = resp.create_activity({}, {
+            current_data = self.client.read(self.user_management,
+                                           user, ['ward_ids'])['ward_ids']
+            resp_act = self.resp.create_activity({}, {
                 'responsible_user_id': user,
-                'location_ids': [[6, False, current_foo]]
+                'location_ids': [[6, False, current_data]]
             })
-            resp.complete(resp_act)
+            self.resp.complete(resp_act)
+
+    def reallocate_all_users(self):
+        for group in self.groups_list:
+            self.reallocate_users_by_group(group)

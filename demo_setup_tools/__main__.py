@@ -1,8 +1,9 @@
 import sys
 import argparse
-from assign_users_to_spells import ReallocateWardManagers
-from observations import SubmitObservations
+
+from assign_users_to_spells import ReallocateUsersToWards
 from discharge_transfer import DischargeTransferCoordinator
+
 
 PARSER = argparse.ArgumentParser('Post Open-eObs Demo installation operations')
 PARSER.add_argument('database', type=str,
@@ -24,7 +25,8 @@ def main():
     args = PARSER.parse_args()
     server = args.server
     database = args.database
-    ReallocateWardManagers(server, database, 'oakley', 'oakley')
+    reallocator = ReallocateUsersToWards(server, database, 'oakley', 'oakley')
+    reallocator.reallocate_all_users()
     DischargeTransferCoordinator(server, database, 'adt', 'adt')
 
 

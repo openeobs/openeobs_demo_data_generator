@@ -58,7 +58,7 @@ class UsersSmokeTest(unittest.TestCase):
                                         [('usage', '=', 'ward')])
 
         patients = self.client.model('nh.clinical.patient')
-        self.patients = patients.search()
+        self.patients = patients.search([])
 
         self.ward_names = []
         for ward in self.wards:
@@ -122,14 +122,16 @@ class UsersSmokeTest(unittest.TestCase):
                          'Incorrect total of patients in ward')
 
     def test_total_patients(self):
-        """Asserts that there are 40 patients in each ward"""
-        self.assertEqual(self.patients, 200, 'Incorrect total of patients')
+        """Asserts that there are 200 patients registered"""
+        self.assertEqual(len(self.patients), 200, 'Incorrect total patients')
 
     def test_ward_nurses(self):
         """Asserts that there are 10 nurses in each ward"""
         for ward in self.wards:
             for list in self.nurse_list:
-                self.assertEqual(len(list), 10, 'Incorrect number of nurses in ' + ward['name'])
+                self.assertEqual(len(list), 10,
+                                 'Incorrect number of nurses in ' +
+                                 ward['name'])
 
     def test_ward_doctors(self):
         """Asserts that there are 4 doctors in each ward"""
@@ -167,7 +169,10 @@ class UsersSmokeTest(unittest.TestCase):
         self.assertEqual(len(dicharged_patients_ids), 20)
 
     def test_transferred_patients(self):
-        pass
+        """Asserts there have been 20 transfers"""
+        transfer_pool = self.client.model('nh.clinical.patient.transfer')
+        transfer_ids = transfer_pool.search([])
+        self.assertEqual(len(transfer_ids), 20)
 
 
 if __name__ == '__main__':

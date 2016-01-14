@@ -2,7 +2,7 @@ import erppeek
 import unittest
 
 
-def get_erppeek_client(server='http://localhost:8069', db='data_demo_test',
+def get_erppeek_client(server='http://localhost:8069', db='nhclinical',
                        user='adt', password='adt'):
     """
     Get a ERPPeek client for us to use, if one not available then close the
@@ -22,8 +22,8 @@ class MobileSmokeTest(unittest.TestCase):
 
     SERVER = 'http://localhost:8069'
     DATABASE = 'nhclinical'
-    USER = 'waino'
-    PASSWORD = 'waino'
+    USER = 'nasir'
+    PASSWORD = 'nasir'
 
     def setUp(self):
         self.client = get_erppeek_client(server=self.SERVER,
@@ -33,8 +33,7 @@ class MobileSmokeTest(unittest.TestCase):
 
     def test_task_list(self):
         assigned_activities = self.api_pool.get_assigned_activities(
-            activity_type='nh.clinical.patient.follow'
-        )
+            activity_type='nh.clinical.patient.follow')
         self.assertTrue(len(assigned_activities) > 0)
 
     def test_patient_list_contains_following_notifications(self):
@@ -55,14 +54,15 @@ class MobileSmokeTest(unittest.TestCase):
 
     def test_there_are_follow_activities(self):
         activity_pool = self.client.model('nh.activity')
-        activity_ids = activity_pool.search([('data_model', '=', 'nh.clinical.patient.follow')])
+        activity_ids = activity_pool.search(
+            [('data_model', '=', 'nh.clinical.patient.follow')])
         self.assertTrue(len(activity_ids) > 0)
 
 
 class UsersSmokeTest(unittest.TestCase):
 
     SERVER = 'http://localhost:8069'
-    DATABASE = 'data_demo_test'
+    DATABASE = 'nhclinical'
     USER = 'adt'
     PASSWORD = 'adt'
 

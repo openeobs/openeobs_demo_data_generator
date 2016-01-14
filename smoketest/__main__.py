@@ -1,7 +1,7 @@
 import sys
 import unittest
 import argparse
-from read_demo_data import UsersSmokeTest
+from read_demo_data import UsersSmokeTest, MobileSmokeTest
 
 PARSER = argparse.ArgumentParser('Run smoke tests for Open-eObs')
 PARSER.add_argument('database', type=str,
@@ -21,12 +21,19 @@ def main():
     args = PARSER.parse_args()
     UsersSmokeTest.SERVER = args.server
     UsersSmokeTest.DATABASE = args.database
-    UsersSmokeTest.USER = args.user
-    UsersSmokeTest.PASSWORD = args.password
+    UsersSmokeTest.USER = 'adt'
+    UsersSmokeTest.PASSWORD = 'adt'
 
     suite = unittest.TestLoader().loadTestsFromTestCase(UsersSmokeTest)
     unittest.TextTestRunner(verbosity=2).run(suite)
 
+    MobileSmokeTest.SERVER = args.server
+    MobileSmokeTest.DATABASE = args.database
+    MobileSmokeTest.USER = 'nasir'
+    MobileSmokeTest.PASSWORD = 'nasir'
+
+    suite = unittest.TestLoader().loadTestsFromTestCase(MobileSmokeTest)
+    unittest.TextTestRunner(verbosity=2).run(suite)
 
 if __name__ == "__main__":
     sys.exit(main())

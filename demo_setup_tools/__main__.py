@@ -1,7 +1,8 @@
-import sys
 import argparse
+import sys
 
-from assign_users_to_spells import ReallocateUsersToWards
+from assign_users_to_spells import (ReallocateUsersToWards,
+                                    ReallocateUsersToBeds)
 from discharge_transfer import DischargeTransferCoordinator
 
 
@@ -25,8 +26,14 @@ def main():
     args = PARSER.parse_args()
     server = args.server
     database = args.database
-    reallocator = ReallocateUsersToWards(server, database, 'oakley', 'oakley')
-    reallocator.reallocate_all_users()
+    # Re-allocate users to their current locations,
+    # to fix the problem about patients not showing up in the Acuity Board.
+    beds_reallocator = ReallocateUsersToBeds(server, database, 'oakley',
+                                             'oakley')
+    beds_reallocator.reallocate_all_users()
+    wards_reallocator = ReallocateUsersToWards(server, database, 'oakley',
+                                               'oakley')
+    wards_reallocator.reallocate_all_users()
     DischargeTransferCoordinator(server, database, 'adt', 'adt')
 
 

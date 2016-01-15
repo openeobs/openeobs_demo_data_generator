@@ -75,3 +75,49 @@ class ReallocateUsersToWards(object):
     def reallocate_all_users(self):
         for group in self.groups_list:
             self.reallocate_users_by_group(group)
+
+
+class ReallocateUsersToBeds(object):
+    """
+    Reallocate users belonging to groups whose users are assigned to beds.
+
+    Such groups are stored in a class attribute, to be easily referenced from
+    inside the class' methods.
+    """
+
+    def __init__(self, server, db, user='admin', password='admin'):
+        self.user_model = 'res.users'
+        self.groups_model = 'res.groups'
+        self.client = get_erppeek_client(server=server, db=db, user=user,
+                                         password=password)
+        self.groups_list = [
+            'NH Clinical Nurse Group',
+            'NH Clinical HCA Group',
+        ]
+
+    def reallocate_users_by_group(self, group_name):
+        """
+        Reallocate users belonging to a specific group, passed as argument.
+
+        :param group_name: name of the group
+        :type group_name: str
+        """
+        group = self.client.search(
+            self.groups_model, [['name', '=', group_name]]
+        )
+        users = self.client.search(
+            self.user_model,
+            [
+                ['pos_id', '!=', None],
+                ['groups_id', 'in', group]
+            ]
+        )
+        user_data = self.client.read(self.user_model, users, ['location_ids'])
+        for user in user_data:
+            current_data = user['location_ids']
+            self.client.write(self.user_model, user['id'],
+                              {'location_ids': current_data})
+
+    def reallocate_all_users(self):
+        for group in self.groups_list:
+            self.reallocate_users_by_group(group)

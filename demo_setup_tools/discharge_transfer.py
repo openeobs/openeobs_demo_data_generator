@@ -37,11 +37,12 @@ class DischargeTransferCoordinator(object):
             DischargePatients(client, 'D', 2)
             DischargePatients(client, 'E', 2)
 
-        TransferPatients(client, 'A', 'B', 4)
-        TransferPatients(client, 'B', 'C', 4)
-        TransferPatients(client, 'C', 'D', 4)
-        TransferPatients(client, 'D', 'E', 4)
-        TransferPatients(client, 'E', 'A', 4)
+	for i in range(2):
+            TransferPatients(client, 'A', 'B', 2)
+            TransferPatients(client, 'B', 'C', 2)
+            TransferPatients(client, 'C', 'D', 2)
+            TransferPatients(client, 'D', 'E', 2)
+            TransferPatients(client, 'E', 'A', 2)
 
 
 class DischargePatients(object):

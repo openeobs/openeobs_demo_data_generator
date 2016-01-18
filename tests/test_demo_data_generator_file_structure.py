@@ -1,4 +1,4 @@
-import fake_filesystem_unittest
+from pyfakefs import fake_filesystem_unittest
 import os
 from demo_data_generators.demo_data_coordinator import DemoDataCoordinator
 from demo_data_generators.admissions import AdmissionsGenerator

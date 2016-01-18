@@ -6,7 +6,7 @@ import random
 
 class NewsGenerator(object):
     """Generates NEWS Observations"""
-    def __init__(self, ward_strategy):
+    def __init__(self, ward_strategy, sequence):
 
         # Create root element
         self.root = Element('openerp')
@@ -65,7 +65,7 @@ class NewsGenerator(object):
                 'avpu_text': 'A'
             }
         }
-
+        self.sequence = sequence
         # Generate the patient observations
         self.generate_news(ward_strategy)
 
@@ -82,7 +82,6 @@ class NewsGenerator(object):
             offset = int(patient.date_terminated[offset_position])
             creator = 'nh_clinical.' + patient.placement_id
             minutes = 15
-            sequence = 0
             date_template = '(datetime.now() + timedelta(-{0}) + ' \
                             'timedelta(minutes={1}))' \
                             '.strftime(\'%Y-%m-%d %H:%M:%S\')'
@@ -94,31 +93,30 @@ class NewsGenerator(object):
                 user_id = ward_strategy.pick_user_id()
 
                 # determine whether obs will be partial
-                if sequence % 10 == 0:
+                if self.sequence % 10 == 0:
                     self.generate_partial_news_observation(
-                        patient, creator, user_id, schedule_date_eval, risk,
-                        sequence
+                        patient, creator, user_id, schedule_date_eval, risk
                     )
                 else:
                     self.generate_completed_news_data(
                         patient, creator, user_id, schedule_date_eval,
-                        complete_date_eval, risk, sequence
+                        complete_date_eval, risk
                     )
 
                     minutes += self.minutes[risk]
                     patient.date_terminated = schedule_date_eval
                     creator = 'nhc_activity_demo_news_{0}_{1}'.format(
-                        patient.id, sequence)
+                        patient.id)
 
                     if self.to_be_completed(offset, minutes):
                         self.generate_notification(
                             patient, creator, schedule_date_eval, risk,
-                            sequence, 'completed'
+                            'completed'
                         )
                     else:
                         self.generate_notification(
                             patient, creator, schedule_date_eval, risk,
-                            sequence, 'scheduled'
+                            'scheduled'
                         )
                     if final_risk in ['medium', 'high']:
                         risk = self.pick_next_risk_increasing(
@@ -131,9 +129,10 @@ class NewsGenerator(object):
                         minutes += random.choice(
                             ward_strategy.overdue_distribution)
                     complete_date_eval = date_template.format(offset, minutes)
-                sequence += 1
+                self.sequence += 1
+
             self.generate_scheduled_news_data(
-                patient, creator, schedule_date_eval, risk, sequence)
+                patient, creator, schedule_date_eval, risk)
 
     def to_be_completed(self, offset, minutes):
         return float(minutes)/(24*60) < offset
@@ -188,7 +187,7 @@ class NewsGenerator(object):
             return 'none'
 
     def generate_partial_news_observation(self, patient, creator, user_id,
-                                          schedule_date, risk, sequence):
+                                          schedule_date, risk):
         self.data.append(
             Comment(
                 'NEWS data for patient {0}'.format(patient.patient_id)
@@ -197,14 +196,14 @@ class NewsGenerator(object):
         # creates a completed observation
         self.create_activity_news_record(
             patient, creator, schedule_date, schedule_date, 'completed',
-            sequence, user_id)
+            user_id)
         # creates a partial observation
-        self.create_partial_news_record(patient, risk, sequence)
-        self.update_activity_news(patient, sequence)
+        self.create_partial_news_record(patient, risk)
+        self.update_activity_news(patient)
 
     def generate_completed_news_data(
             self, patient, creator, user_id, schedule_date, complete_date,
-            risk, sequence):
+            risk):
         self.data.append(
             Comment(
                 'NEWS data for patient {0}'.format(patient.patient_id)
@@ -212,24 +211,24 @@ class NewsGenerator(object):
         )
         self.create_activity_news_record(
             patient, creator, schedule_date, complete_date, 'completed',
-            sequence, user_id)
-        self.create_news_record(patient, risk, True, sequence)
-        self.update_activity_news(patient, sequence)
+            user_id)
+        self.create_news_record(patient, risk, True)
+        self.update_activity_news(patient)
 
     def generate_scheduled_news_data(
-            self, patient, creator, schedule_date, risk, sequence):
+            self, patient, creator, schedule_date, risk):
         self.data.append(
             Comment(
                 'NEWS data for patient {0}'.format(patient.patient_id)
             )
         )
         self.create_activity_news_record(
-            patient, creator, schedule_date, '', 'scheduled', sequence)
-        self.create_news_record(patient, risk, False, sequence)
-        self.update_activity_news(patient, sequence)
+            patient, creator, schedule_date, '', 'scheduled')
+        self.create_news_record(patient, risk, False)
+        self.update_activity_news(patient)
 
     def generate_notification(
-            self, patient, creator, schedule_date, risk, sequence, state):
+            self, patient, creator, schedule_date, risk, state):
         if risk not in ['low', 'medium', 'high']:
             return
         self.data.append(
@@ -239,32 +238,32 @@ class NewsGenerator(object):
         )
         if risk == 'low':
             self.create_activity_not_record(
-                patient, schedule_date, state, sequence, creator,
+                patient, schedule_date, state, creator,
                 'nh.clinical.notification.assessment', 'Assess Patient')
             self.create_not_record(
-                patient, sequence, 'nh.clinical.notification.assessment')
+                patient, 'nh.clinical.notification.assessment')
             self.update_activity_not(
-                patient, sequence, 'nh.clinical.notification.assessment')
+                patient, 'nh.clinical.notification.assessment')
         elif risk == 'medium':
             self.create_activity_not_record(
-                patient, schedule_date, state, sequence, creator,
+                patient, schedule_date, state, creator,
                 'nh.clinical.notification.medical_team',
                 'Urgently inform medical team')
             self.create_not_record(
-                patient, sequence, 'nh.clinical.notification.medical_team')
+                patient, 'nh.clinical.notification.medical_team')
             self.update_activity_not(
-                patient, sequence, 'nh.clinical.notification.medical_team')
+                patient, 'nh.clinical.notification.medical_team')
         else:
             self.create_activity_not_record(
-                patient, schedule_date, state, sequence, creator,
+                patient, schedule_date, state, creator,
                 'nh.clinical.notification.medical_team',
                 'Immediately inform medical team')
             self.create_not_record(
-                patient, sequence, 'nh.clinical.notification.medical_team')
+                patient, 'nh.clinical.notification.medical_team')
             self.update_activity_not(
-                patient, sequence, 'nh.clinical.notification.medical_team')
+                patient, 'nh.clinical.notification.medical_team')
 
-    def update_activity_news(self, patient, sequence):
+    def update_activity_news(self, patient):
         """Update activity NEWS"""
 
         # Create nh.clinical.patient.observation.ews record with id & data
@@ -274,7 +273,7 @@ class NewsGenerator(object):
             {
                 'model': 'nh.activity',
                 'id': 'nhc_activity_demo_news_{0}_{1}'.format(
-                    patient.id, sequence)
+                    patient.id, self.sequence)
             }
         )
 
@@ -286,11 +285,11 @@ class NewsGenerator(object):
             'field',
             {
                 'name': 'data_ref',
-                'eval': eval_string.format(patient.id, sequence)
+                'eval': eval_string.format(patient.id, self.sequence)
             }
         )
 
-    def create_partial_news_record(self, patient, risk, sequence):
+    def create_partial_news_record(self, patient, risk):
         """Create partial NEWS record"""
 
         # Create nh.activity NEWS record with id
@@ -300,7 +299,7 @@ class NewsGenerator(object):
             {
                 'model': 'nh.clinical.patient.observation.ews',
                 'id': 'nhc_demo_news_{0}_{1}'.format(
-                    patient.id, sequence)
+                    patient.id, self.sequence)
             }
         )
 
@@ -311,7 +310,7 @@ class NewsGenerator(object):
             {
                 'name': 'activity_id',
                 'ref': 'nhc_activity_demo_news_{0}_{1}'.format(
-                    patient.id, sequence)
+                    patient.id, self.sequence)
             }
         )
 
@@ -391,7 +390,7 @@ class NewsGenerator(object):
         )
         avpu.text = self.values[risk]['avpu_text']
 
-    def create_news_record(self, patient, risk, complete, sequence):
+    def create_news_record(self, patient, risk, complete):
         """Create NEWS record"""
 
         # Create nh.activity NEWS record with id
@@ -401,7 +400,7 @@ class NewsGenerator(object):
             {
                 'model': 'nh.clinical.patient.observation.ews',
                 'id': 'nhc_demo_news_{0}_{1}'.format(
-                    patient.id, sequence)
+                    patient.id, self.sequence)
             }
         )
 
@@ -412,7 +411,7 @@ class NewsGenerator(object):
             {
                 'name': 'activity_id',
                 'ref': 'nhc_activity_demo_news_{0}_{1}'.format(
-                    patient.id, sequence)
+                    patient.id, self.sequence)
             }
         )
 
@@ -502,8 +501,7 @@ class NewsGenerator(object):
             avpu.text = self.values[risk]['avpu_text']
 
     def create_activity_news_record(
-            self, patient, creator, date, complete_date, state, sequence,
-            user_id=False):
+            self, patient, creator, date, complete_date, state, user_id=False):
         """Create activity NEWS record"""
 
         # Create nh.activity NEWS record with id
@@ -513,7 +511,7 @@ class NewsGenerator(object):
             {
                 'model': 'nh.activity',
                 'id': 'nhc_activity_demo_news_{0}_{1}'.format(
-                    patient.id, sequence)
+                    patient.id, self.sequence)
             }
         )
 
@@ -614,7 +612,7 @@ class NewsGenerator(object):
             )
 
     def create_activity_not_record(
-            self, patient, date, state, sequence, creator, model, title):
+            self, patient, date, state, creator, model, title):
         """Create activity notification record"""
 
         # Create nh.activity notification record with id
@@ -624,7 +622,7 @@ class NewsGenerator(object):
             {
                 'model': 'nh.activity',
                 'id': 'nhc_activity_demo_not_{0}_{1}'.format(
-                    patient.id, sequence)
+                    patient.id, self.sequence)
             }
         )
 
@@ -722,7 +720,7 @@ class NewsGenerator(object):
                 }
             )
 
-    def create_not_record(self, patient, sequence, model):
+    def create_not_record(self, patient, model):
         """Create NEWS record"""
 
         # Create nh.activity notification record with id
@@ -732,7 +730,7 @@ class NewsGenerator(object):
             {
                 'model': model,
                 'id': 'nhc_demo_not_{0}_{1}'.format(
-                    patient.id, sequence)
+                    patient.id, self.sequence)
             }
         )
 
@@ -743,7 +741,7 @@ class NewsGenerator(object):
             {
                 'name': 'activity_id',
                 'ref': 'nhc_activity_demo_not_{0}_{1}'.format(
-                    patient.id, sequence)
+                    patient.id, self.sequence)
             }
         )
 
@@ -757,7 +755,7 @@ class NewsGenerator(object):
             }
         )
 
-    def update_activity_not(self, patient, sequence, model):
+    def update_activity_not(self, patient, model):
         """Update activity notification"""
 
         # Create notification record with id & data
@@ -767,7 +765,7 @@ class NewsGenerator(object):
             {
                 'model': 'nh.activity',
                 'id': 'nhc_activity_demo_not_{0}_{1}'.format(
-                    patient.id, sequence)
+                    patient.id, self.sequence)
             }
         )
 
@@ -779,6 +777,6 @@ class NewsGenerator(object):
             'field',
             {
                 'name': 'data_ref',
-                'eval': eval_string.format(patient.id, sequence)
+                'eval': eval_string.format(patient.id, self.sequence)
             }
         )

@@ -55,6 +55,8 @@ class DemoDataCoordinator(object):
         # Generate demo data for each ward,
         # with files named after different type of data,
         # grouped in one folder for each ward
+        self.sequence = 0
+
         for index, ward in enumerate(wards):
             # Locations demo data
             locations = LocationsGenerator(ward, beds_per_ward)
@@ -116,7 +118,8 @@ class DemoDataCoordinator(object):
             )
 
             # NEWS demo data
-            news = NewsGenerator(ward_strategy)
+            news = NewsGenerator(ward_strategy, self.sequence)
+            self.sequence = news.sequence + 1
 
             # Pretty format the XML trees
             self.indent(locations.root)

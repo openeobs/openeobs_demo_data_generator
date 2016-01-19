@@ -789,13 +789,13 @@ class NewsGenerator(object):
 
         if model == 'nh.clinical.notification.assessment':
             sequence = self.assess_seq
-            eval_string = '\'' + model + ',\' + ' \
-                                         'str(ref(\'nhc_demo_not_assess_{0}_{1}\'))'
+            eval_string = '\'' + model + \
+                          ',\' + str(ref(\'nhc_demo_not_assess_{0}_{1}\'))'
             id_string = 'nhc_activity_demo_not_assess_{0}_{1}'
         else:
             sequence = self.medical_seq
-            eval_string = '\'' + model + ',\' + ' \
-                                         'str(ref(\'nhc_demo_not_medical_{0}_{1}\'))'
+            eval_string = '\'' + model + \
+                          ',\' + str(ref(\'nhc_demo_not_medical_{0}_{1}\'))'
             id_string = 'nhc_activity_demo_not_medical_{0}_{1}'
 
         # Create notification record with id & data

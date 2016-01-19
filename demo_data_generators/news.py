@@ -6,7 +6,7 @@ import random
 
 class NewsGenerator(object):
     """Generates NEWS Observations"""
-    def __init__(self, ward_strategy, sequence):
+    def __init__(self, ward_strategy, ews_seq, assess_seq, medical_seq):
 
         # Create root element
         self.root = Element('openerp')
@@ -65,7 +65,9 @@ class NewsGenerator(object):
                 'avpu_text': 'A'
             }
         }
-        self.sequence = sequence
+        self.ews_seq = ews_seq
+        self.assess_seq = assess_seq
+        self.medical_seq = medical_seq
         # Generate the patient observations
         self.generate_news(ward_strategy)
 
@@ -93,7 +95,7 @@ class NewsGenerator(object):
                 user_id = ward_strategy.pick_user_id()
 
                 # determine whether obs will be partial
-                if self.sequence % 10 == 0:
+                if self.ews_seq % 10 == 0:
                     self.generate_partial_news_observation(
                         patient, creator, user_id, schedule_date_eval, risk
                     )
@@ -106,7 +108,7 @@ class NewsGenerator(object):
                     minutes += self.minutes[risk]
                     patient.date_terminated = schedule_date_eval
                     creator = 'nhc_activity_demo_news_{0}_{1}'.format(
-                        patient.id)
+                        patient.id, self.ews_seq)
 
                     if self.to_be_completed(offset, minutes):
                         self.generate_notification(
@@ -124,12 +126,15 @@ class NewsGenerator(object):
                     else:
                         risk = self.pick_next_risk_decreasing(
                             offset, minutes, risk, final_risk)
+
                     schedule_date_eval = date_template.format(offset, minutes)
+
                     if self.is_overdue(ward_strategy.overdue_ratio):
                         minutes += random.choice(
                             ward_strategy.overdue_distribution)
                     complete_date_eval = date_template.format(offset, minutes)
-                self.sequence += 1
+
+                self.ews_seq += 1
 
             self.generate_scheduled_news_data(
                 patient, creator, schedule_date_eval, risk)
@@ -244,6 +249,9 @@ class NewsGenerator(object):
                 patient, 'nh.clinical.notification.assessment')
             self.update_activity_not(
                 patient, 'nh.clinical.notification.assessment')
+
+            self.assess_seq += 1
+
         elif risk == 'medium':
             self.create_activity_not_record(
                 patient, schedule_date, state, creator,
@@ -253,6 +261,9 @@ class NewsGenerator(object):
                 patient, 'nh.clinical.notification.medical_team')
             self.update_activity_not(
                 patient, 'nh.clinical.notification.medical_team')
+
+            self.medical_seq += 1
+
         else:
             self.create_activity_not_record(
                 patient, schedule_date, state, creator,
@@ -262,6 +273,8 @@ class NewsGenerator(object):
                 patient, 'nh.clinical.notification.medical_team')
             self.update_activity_not(
                 patient, 'nh.clinical.notification.medical_team')
+
+            self.assess_seq += 1
 
     def update_activity_news(self, patient):
         """Update activity NEWS"""
@@ -273,7 +286,7 @@ class NewsGenerator(object):
             {
                 'model': 'nh.activity',
                 'id': 'nhc_activity_demo_news_{0}_{1}'.format(
-                    patient.id, self.sequence)
+                    patient.id, self.ews_seq)
             }
         )
 
@@ -285,7 +298,7 @@ class NewsGenerator(object):
             'field',
             {
                 'name': 'data_ref',
-                'eval': eval_string.format(patient.id, self.sequence)
+                'eval': eval_string.format(patient.id, self.ews_seq)
             }
         )
 
@@ -299,7 +312,7 @@ class NewsGenerator(object):
             {
                 'model': 'nh.clinical.patient.observation.ews',
                 'id': 'nhc_demo_news_{0}_{1}'.format(
-                    patient.id, self.sequence)
+                    patient.id, self.ews_seq)
             }
         )
 
@@ -310,7 +323,7 @@ class NewsGenerator(object):
             {
                 'name': 'activity_id',
                 'ref': 'nhc_activity_demo_news_{0}_{1}'.format(
-                    patient.id, self.sequence)
+                    patient.id, self.ews_seq)
             }
         )
 
@@ -400,7 +413,7 @@ class NewsGenerator(object):
             {
                 'model': 'nh.clinical.patient.observation.ews',
                 'id': 'nhc_demo_news_{0}_{1}'.format(
-                    patient.id, self.sequence)
+                    patient.id, self.ews_seq)
             }
         )
 
@@ -411,7 +424,7 @@ class NewsGenerator(object):
             {
                 'name': 'activity_id',
                 'ref': 'nhc_activity_demo_news_{0}_{1}'.format(
-                    patient.id, self.sequence)
+                    patient.id, self.ews_seq)
             }
         )
 
@@ -511,7 +524,7 @@ class NewsGenerator(object):
             {
                 'model': 'nh.activity',
                 'id': 'nhc_activity_demo_news_{0}_{1}'.format(
-                    patient.id, self.sequence)
+                    patient.id, self.ews_seq)
             }
         )
 
@@ -615,14 +628,21 @@ class NewsGenerator(object):
             self, patient, date, state, creator, model, title):
         """Create activity notification record"""
 
+        if model == 'nh.clinical.notification.assessment':
+            sequence = self.assess_seq
+            id_string = 'nhc_activity_demo_not_assess_{0}_{1}'
+        else:
+            sequence = self.medical_seq
+            id_string = 'nhc_activity_demo_not_medical_{0}_{1}'
+
         # Create nh.activity notification record with id
         activity_not_record = SubElement(
             self.data,
             'record',
             {
                 'model': 'nh.activity',
-                'id': 'nhc_activity_demo_not_{0}_{1}'.format(
-                    patient.id, self.sequence)
+                'id': id_string.format(
+                    patient.id, sequence)
             }
         )
 
@@ -723,14 +743,23 @@ class NewsGenerator(object):
     def create_not_record(self, patient, model):
         """Create NEWS record"""
 
+        if model == 'nh.clinical.notification.assessment':
+            sequence = self.assess_seq
+            id_string = 'nhc_demo_not_assess_{0}_{1}'
+            ref_string = 'nhc_activity_demo_not_assess_{0}_{1}'
+        else:
+            sequence = self.medical_seq
+            id_string = 'nhc_demo_not_medical_{0}_{1}'
+            ref_string = 'nhc_activity_demo_not_medical_{0}_{1}'
+
         # Create nh.activity notification record with id
         news_record = SubElement(
             self.data,
             'record',
             {
                 'model': model,
-                'id': 'nhc_demo_not_{0}_{1}'.format(
-                    patient.id, self.sequence)
+                'id': id_string.format(
+                    patient.id, sequence)
             }
         )
 
@@ -740,8 +769,8 @@ class NewsGenerator(object):
             'field',
             {
                 'name': 'activity_id',
-                'ref': 'nhc_activity_demo_not_{0}_{1}'.format(
-                    patient.id, self.sequence)
+                'ref': ref_string.format(
+                    patient.id, sequence)
             }
         )
 
@@ -758,25 +787,34 @@ class NewsGenerator(object):
     def update_activity_not(self, patient, model):
         """Update activity notification"""
 
+        if model == 'nh.clinical.notification.assessment':
+            sequence = self.assess_seq
+            eval_string = '\'' + model + ',\' + ' \
+                                         'str(ref(\'nhc_demo_not_assess_{0}_{1}\'))'
+            id_string = 'nhc_activity_demo_not_assess_{0}_{1}'
+        else:
+            sequence = self.medical_seq
+            eval_string = '\'' + model + ',\' + ' \
+                                         'str(ref(\'nhc_demo_not_medical_{0}_{1}\'))'
+            id_string = 'nhc_activity_demo_not_medical_{0}_{1}'
+
         # Create notification record with id & data
         update_activity_news_record = SubElement(
             self.data,
             'record',
             {
                 'model': 'nh.activity',
-                'id': 'nhc_activity_demo_not_{0}_{1}'.format(
-                    patient.id, self.sequence)
+                'id': id_string.format(
+                    patient.id, sequence)
             }
         )
 
         # Create activity ref
-        eval_string = '\'' + model + ',\' + ' \
-                      'str(ref(\'nhc_demo_news_{0}_{1}\'))'
         SubElement(
             update_activity_news_record,
             'field',
             {
                 'name': 'data_ref',
-                'eval': eval_string.format(patient.id, self.sequence)
+                'eval': eval_string.format(patient.id, sequence)
             }
         )

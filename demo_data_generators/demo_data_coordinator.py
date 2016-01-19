@@ -55,7 +55,9 @@ class DemoDataCoordinator(object):
         # Generate demo data for each ward,
         # with files named after different type of data,
         # grouped in one folder for each ward
-        self.sequence = 0
+        self.ews_seq = 0
+        self.assess_seq = 0
+        self.medical_seq = 0
 
         for index, ward in enumerate(wards):
             # Locations demo data
@@ -115,11 +117,16 @@ class DemoDataCoordinator(object):
             ward_strategy = WardStrategy(
                 news_patients, hca_nurse_ids, risk_distribution,
                 partial_news_per_patient, overdue_ratio, overdue_distribution
+
             )
 
             # NEWS demo data
-            news = NewsGenerator(ward_strategy, self.sequence)
-            self.sequence = news.sequence + 1
+            news = NewsGenerator(ward_strategy, self.ews_seq, self.assess_seq,
+                                 self.medical_seq)
+
+            self.ews_seq = news.ews_seq
+            self.assess_seq = news.assess_seq
+            self.medical_seq = news.medical_seq
 
             # Pretty format the XML trees
             self.indent(locations.root)

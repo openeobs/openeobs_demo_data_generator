@@ -5,6 +5,7 @@ from demo_setup_tools.assign_users_to_spells import (ReallocateUsersToBeds,
 from demo_setup_tools.discharge_transfer import DischargeTransferCoordinator
 from smoketest.read_demo_data import UsersSmokeTest, MobileSmokeTest
 import unittest
+from security.change_admin_password import ChangeAdminPassword
 
 
 def get_erppeek_client(server='http://localhost:8069', db='openerp',
@@ -18,15 +19,8 @@ def get_erppeek_client(server='http://localhost:8069', db='openerp',
     :param password: Password for username connecting with
     :return: A erppeek.Client object we can use for XML-RPC calls
     """
-    try:
-        client = Client(server, db=db, user=user, password=password,
-                                verbose=False)
-    except:
-        raise RuntimeError(
-            "Error connecting to {0} on {1} using credentials {2}:{3}".format(
-                db, server, user, password
-            )
-        )
+    client = Client(server, db=db, user=user, password=password,
+                    verbose=False)
     return client
 
 
@@ -54,13 +48,16 @@ class RefreshDemo(object):
             raise RuntimeError('Error creating new database')
         # Install Open eObs
         self.client = get_erppeek_client(server, db=self.temp_db_name,
-                                         user=user, password='admin')
+                                         user=user,
+                                         password=self.admin_password)
         if not self.install_eobs():
             raise RuntimeError('Error installing Open eObs')
         # Run post setup scripts against open eObs
         self.post_install_setup()
         # Run smoke tests against open eObs
         self.run_smoke_tests()
+        # Change the admin password
+        self.change_admin_password()
         # If we all good then rename specified database
         old_db_name = '{0}_old'.format(self.database)
         if not self.rename_database(self.database,
@@ -160,3 +157,10 @@ class RefreshDemo(object):
         """
         self.client.db.drop(self.db_admin, db_to_drop)
         return self.check_database(db_to_drop)
+
+    def change_admin_password(self):
+        """
+        Change the admin password for the new instance
+        """
+        ChangeAdminPassword(self.server, self.temp_db_name,
+                            self.admin_password)

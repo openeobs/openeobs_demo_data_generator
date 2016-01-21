@@ -6,7 +6,7 @@ install:
   - pip install -r requirements.txt
 # command to run tests
 script:
-- nosetests --with-coverage
+- nosetests tests/ --with-coverage
 - flake8 demo_data_generators
 # Run analysis on code base
 after_script:

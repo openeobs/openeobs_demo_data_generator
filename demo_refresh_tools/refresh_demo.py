@@ -87,7 +87,8 @@ class RefreshDemo(object):
         Create a new database
         :return: True if successful
         """
-        self.client.db.create_database(self.db_admin, self.temp_db_name)
+        self.client.db.create_database(self.db_admin, self.temp_db_name, True,
+                                       'en_GB')
         return self.check_database(self.temp_db_name)
 
     def install_eobs(self):

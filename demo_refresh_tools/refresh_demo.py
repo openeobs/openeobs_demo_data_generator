@@ -3,7 +3,7 @@ from datetime import datetime
 from demo_setup_tools.assign_users_to_spells import (ReallocateUsersToBeds,
                                                      ReallocateUsersToWards)
 from demo_setup_tools.discharge_transfer import DischargeTransferCoordinator
-from read_demo_data import UsersSmokeTest, MobileSmokeTest
+from smoketest.read_demo_data import UsersSmokeTest, MobileSmokeTest
 import unittest
 
 

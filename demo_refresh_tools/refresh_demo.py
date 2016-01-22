@@ -3,7 +3,7 @@ from datetime import datetime
 from demo_setup_tools.assign_users_to_spells import (ReallocateUsersToBeds,
                                                      ReallocateUsersToWards)
 from demo_setup_tools.discharge_transfer import DischargeTransferCoordinator
-from smoketest.read_demo_data import UsersSmokeTest, MobileSmokeTest
+from smoketest.smoke_test import SmokeTest
 import unittest
 from security.change_admin_password import ChangeAdminPassword
 
@@ -123,20 +123,12 @@ class RefreshDemo(object):
         """
         Run some post deployment smoke tests
         """
-        UsersSmokeTest.SERVER = self.server
-        UsersSmokeTest.DATABASE = self.temp_db_name
-        UsersSmokeTest.USER = 'adt'
-        UsersSmokeTest.PASSWORD = 'adt'
+        SmokeTest.SERVER = self.server
+        SmokeTest.DATABASE = self.temp_db_name
+        SmokeTest.USER = 'adt'
+        SmokeTest.PASSWORD = 'adt'
 
-        suite = unittest.TestLoader().loadTestsFromTestCase(UsersSmokeTest)
-        unittest.TextTestRunner(verbosity=2).run(suite)
-
-        MobileSmokeTest.SERVER = self.server
-        MobileSmokeTest.DATABASE = self.temp_db_name
-        MobileSmokeTest.USER = 'nasir'
-        MobileSmokeTest.PASSWORD = 'nasir'
-
-        suite = unittest.TestLoader().loadTestsFromTestCase(MobileSmokeTest)
+        suite = unittest.TestLoader().loadTestsFromTestCase(SmokeTest)
         unittest.TextTestRunner(verbosity=2).run(suite)
 
     def rename_database(self, current_name, new_name):

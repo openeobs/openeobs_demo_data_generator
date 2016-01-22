@@ -37,7 +37,7 @@ class RefreshDemo(object):
         self.password = password
         self.admin_password = admin_password
         self.db_admin = db_admin
-        self.temp_db_name = datetime.strftime('nhclinical_%Y%m%d')
+        self.temp_db_name = datetime.now().strftime('nhclinical_%Y%m%d')
         self.client = get_erppeek_client(server, db=database, user=user,
                                          password=password)
         # Check to make sure specified database exists

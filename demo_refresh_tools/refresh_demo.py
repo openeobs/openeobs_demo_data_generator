@@ -59,14 +59,20 @@ class RefreshDemo(object):
         # Change the admin password
         self.change_admin_password()
         # If we all good then rename specified database
-        old_db_name = '{0}_old'.format(self.database)
-        if not self.rename_database(self.database,
-                                    old_db_name):
+
+        # store name of database you want to rename
+        old_db_name = self.database
+
+        # create name for db you want to retire, rename that db
+        temp_db_name_old = '{0}_old'.format(self.database)
+        if not self.rename_database(self.database, temp_db_name_old):
             raise RuntimeError('Error renaming old database')
-        # Rename new database
-        if not self.rename_database(self.temp_db_name, self.database):
+
+        # Rename new database to how the original db name is called
+        if not self.rename_database(self.temp_db_name, old_db_name):
             self.rename_database(old_db_name, self.database)
             raise RuntimeError('Error renaming new database, reverting old')
+
         # Drop the old database - will return true if database still there
         if self.remove_old_database(self.database):
             raise RuntimeError('Error removing old database')

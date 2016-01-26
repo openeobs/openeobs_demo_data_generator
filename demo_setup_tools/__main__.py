@@ -4,7 +4,7 @@ import sys
 from assign_users_to_spells import (ReallocateUsersToWards,
                                     ReallocateUsersToBeds)
 from discharge_transfer import DischargeTransferCoordinator
-
+from db_operations import refresh_materialized_views
 
 PARSER = argparse.ArgumentParser('Post Open-eObs Demo installation operations')
 PARSER.add_argument('database', type=str,
@@ -35,6 +35,7 @@ def main():
                                                'oakley')
     wards_reallocator.reallocate_all_users()
     DischargeTransferCoordinator(server, database, 'adt', 'adt')
+    refresh_materialized_views()
 
 
 if __name__ == '__main__':

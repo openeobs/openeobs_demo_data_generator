@@ -30,14 +30,14 @@ class DischargeTransferCoordinator(object):
                                     password=password)
 
         # go two-by-two as ward already has 28 patients placed (max 30)
-        for i in range(2):
+        for _ in range(2):
             DischargePatients(client, 'A', 2)
             DischargePatients(client, 'B', 2)
             DischargePatients(client, 'C', 2)
             DischargePatients(client, 'D', 2)
             DischargePatients(client, 'E', 2)
 
-	for i in range(2):
+        for _ in range(2):
             TransferPatients(client, 'A', 'B', 2)
             TransferPatients(client, 'B', 'C', 2)
             TransferPatients(client, 'C', 'D', 2)

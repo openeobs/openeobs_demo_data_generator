@@ -82,7 +82,7 @@ class NewsGenerator(object):
             risk = self.starting_risk[final_risk]
             offset_position = patient.date_terminated.find('timedelta(-') + 11
             offset = int(patient.date_terminated[offset_position])
-            creator = 'nh_clinical.' + patient.placement_id
+            creator = patient.placement_id
             minutes = 15
             date_template = '(datetime.now() + timedelta(-{0}) + ' \
                             'timedelta(minutes={1}))' \
@@ -333,7 +333,7 @@ class NewsGenerator(object):
             'field',
             {
                 'name': 'patient_id',
-                'ref': 'nh_clinical.' + patient.patient_id
+                'ref': patient.patient_id
             }
         )
 
@@ -434,7 +434,7 @@ class NewsGenerator(object):
             'field',
             {
                 'name': 'patient_id',
-                'ref': 'nh_clinical.' + patient.patient_id
+                'ref': patient.patient_id
             }
         )
 
@@ -534,7 +534,7 @@ class NewsGenerator(object):
             'field',
             {
                 'name': 'patient_id',
-                'ref': 'nh_clinical.' + patient.patient_id
+                'ref': patient.patient_id
             }
         )
 
@@ -554,7 +554,7 @@ class NewsGenerator(object):
             'field',
             {
                 'name': 'parent_id',
-                'ref': 'nh_clinical.' + patient.spell_activity_id
+                'ref': patient.spell_activity_id
             }
         )
 
@@ -564,7 +564,7 @@ class NewsGenerator(object):
             'field',
             {
                 'name': 'spell_activity_id',
-                'ref': 'nh_clinical.' + patient.spell_activity_id
+                'ref': patient.spell_activity_id
             }
         )
 
@@ -591,7 +591,7 @@ class NewsGenerator(object):
             'field',
             {
                 'name': 'location_id',
-                'ref': 'nh_clinical.' + patient.location_id
+                'ref': patient.location_id
             }
         )
 
@@ -620,7 +620,7 @@ class NewsGenerator(object):
                 'field',
                 {
                     'name': 'terminate_uid',
-                    'ref': 'nh_clinical.' + str(user_id)
+                    'ref': str(user_id)
                 }
             )
 
@@ -652,7 +652,7 @@ class NewsGenerator(object):
             'field',
             {
                 'name': 'patient_id',
-                'ref': 'nh_clinical.' + patient.patient_id
+                'ref': patient.patient_id
             }
         )
 
@@ -672,7 +672,7 @@ class NewsGenerator(object):
             'field',
             {
                 'name': 'parent_id',
-                'ref': 'nh_clinical.' + patient.spell_activity_id
+                'ref': patient.spell_activity_id
             }
         )
 
@@ -682,7 +682,7 @@ class NewsGenerator(object):
             'field',
             {
                 'name': 'spell_activity_id',
-                'ref': 'nh_clinical.' + patient.spell_activity_id
+                'ref': patient.spell_activity_id
             }
         )
 
@@ -715,7 +715,7 @@ class NewsGenerator(object):
             'field',
             {
                 'name': 'location_id',
-                'ref': 'nh_clinical.' + patient.location_id
+                'ref': patient.location_id
             }
         )
 
@@ -780,7 +780,7 @@ class NewsGenerator(object):
             'field',
             {
                 'name': 'patient_id',
-                'ref': 'nh_clinical.' + patient.patient_id
+                'ref': patient.patient_id
             }
         )
 

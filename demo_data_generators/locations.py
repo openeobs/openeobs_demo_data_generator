@@ -37,7 +37,8 @@ class LocationsGenerator(object):
                                    'Bed {0}'.format(bed_id), 'bed',
                                    'w{0}'.format(ward_name), ward_name, bed_id)
 
-    def generate_location(self, rid, name, usage, parent, ward, bed_number):
+    def generate_location(self, rid, name, usage, parent, ward, bed_number,
+                          context=None):
         """Generate a location"""
         # Create record with location data
         record = SubElement(
@@ -74,4 +75,12 @@ class LocationsGenerator(object):
         SubElement(record, 'field', {
             'name': 'parent_id',
             'ref': 'nhc_def_conf_location_{0}'.format(parent)
+            })
+
+        # create a reference to context
+        if not context:
+            context = "nh_eobs.nh_eobs_context"
+        SubElement(record, 'field', {
+            'name': 'context_ids',
+            'eval': "[(4, ref({0}))]".format(context)
             })

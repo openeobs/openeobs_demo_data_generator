@@ -82,5 +82,5 @@ class LocationsGenerator(object):
             context = "nh_eobs.nh_eobs_context"
         SubElement(record, 'field', {
             'name': 'context_ids',
-            'eval': "[(4, ref({0}))]".format(context)
+            'eval': "[[6, False, [ref('{0}')]]]".format(context)
             })

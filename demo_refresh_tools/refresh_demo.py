@@ -1,7 +1,5 @@
 from erppeek import Client
 from datetime import datetime
-from demo_setup_tools.assign_users_to_spells import (ReallocateUsersToBeds,
-                                                     ReallocateUsersToWards)
 from demo_setup_tools.discharge_transfer import DischargeTransferCoordinator
 from smoketest.smoke_test import SmokeTest
 import unittest
@@ -111,17 +109,8 @@ class RefreshDemo(object):
 
     def post_install_setup(self):
         """
-        Reallocate users to beds and wards and discharge / transfer some
-        patients
+        Discharge / transfer some patients
         """
-        beds_reallocator = ReallocateUsersToBeds(self.server,
-                                                 self.temp_db_name,
-                                                 'oakley', 'oakley')
-        beds_reallocator.reallocate_all_users()
-        wards_reallocator = ReallocateUsersToWards(self.server,
-                                                   self.temp_db_name,
-                                                   'oakley',  'oakley')
-        wards_reallocator.reallocate_all_users()
         DischargeTransferCoordinator(self.server, self.temp_db_name, 'adt',
                                      'adt')
 

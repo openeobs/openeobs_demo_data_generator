@@ -4,7 +4,12 @@ import sys
 import os
 import argparse
 import json
+import yaml
+import logging
 from demo_data_generators.demo_data_coordinator import DemoDataCoordinator
+
+
+_logger = logging.getLogger(__name__)
 
 DEFAULT_USERS = '{"doctor": {"unassigned": 4, "total": 24, "per_ward": 4}, ' \
                 '"admin": {"unassigned": 0, "multi_wards": "all", "total": 1' \
@@ -16,6 +21,13 @@ DEFAULT_USERS = '{"doctor": {"unassigned": 4, "total": 24, "per_ward": 4}, ' \
                 '"nurse": {"unassigned": 5, "total": 55, "per_ward": 10},' \
                 ' "ward_manager": {"unassigned": 1, "total": 6, "per_ward": ' \
                 '1}}'
+try:
+    with open('users_schema.yaml') as yaml_file:
+        DEFAULT_USERS_YAML = yaml.load(yaml_file)
+except IOError:
+    _logger.debug("No YAML file named 'users_schema.yaml' can be found "
+                  "for the users schema configuration.")
+    DEFAULT_USERS_YAML = None
 
 PARSER = argparse.ArgumentParser('Generate demo data for NH Clinical')
 PARSER.add_argument('data_folder', type=str,
@@ -32,6 +44,8 @@ PARSER.add_argument('--patientsnotinbed', type=int,
                     help='Number of patients not in a bed', default=12)
 PARSER.add_argument('--users', type=str,
                     help='JSON for user break down', default=DEFAULT_USERS)
+PARSER.add_argument('--users-yaml', type=str, help='YAML for user break down',
+                    dest='users_yaml', default=DEFAULT_USERS_YAML)
 
 
 def main():
@@ -45,10 +59,13 @@ def main():
     bed_patient_per_ward = args.patientsinbed
     non_bed_patient_per_ward = args.patientsnotinbed
     users_schema = args.users
+    users_schema_yaml = args.users_yaml
 
     if wards:
         wards = wards.replace(' ', '').split(',')
-    if users_schema:
+    if users_schema_yaml:
+        users_schema = yaml.load(users_schema_yaml)
+    elif users_schema:
         users_schema = json.loads(users_schema)
     if data_folder:
         data_folder = sanitise_data_folder(data_folder)

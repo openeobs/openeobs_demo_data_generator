@@ -10,7 +10,7 @@ class Field(object):
         if 'value' in attributes:
             value = attributes['value']
             del attributes['value']
-        
+
         self._element = SubElement(record, 'field', attributes)
         self.value = value
 
@@ -57,7 +57,7 @@ class Record(object):
 
     def field(self, attributes):
         return Field(self._element, attributes)
-    
+
     @property
     def model(self):
         return self._element.attrib['model']
@@ -91,4 +91,3 @@ class Document(object):
 
     def record(self, attributes):
         return Record(self.data, attributes)
-

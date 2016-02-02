@@ -166,8 +166,12 @@ class UsersGenerator(object):
         SubElement(record, 'field',
                    {'name': 'location_ids', 'eval': locations})
         # Create pos field
-        SubElement(record, 'field',
-                   {'name': 'pos_id', 'ref': 'nh_clinical.nhc_location_default_pos'})
+        SubElement(
+            record, 'field',
+            {
+                'name': 'pos_ids',
+                'eval':
+                    "[[6,0,[ref('nh_clinical.nhc_location_default_pos')]]]"})
 
     def generate_adt_user(self):
         record = SubElement(self.class_data, 'record',
@@ -190,8 +194,12 @@ class UsersGenerator(object):
                    {'name': 'category_id',
                     'eval': "[(4, ref('nh_clinical.role_nhc_admin'))]"})
 
-        SubElement(record, 'field',
-                   {'name': 'pos_id', 'ref': 'nh_clinical.nhc_location_default_pos'})
+        SubElement(
+            record, 'field',
+            {
+                'name': 'pos_ids',
+                'eval':
+                    "[[6,0,[ref('nh_clinical.nhc_location_default_pos')]]]"})
 
     def generate_users_per_ward(self, ward, beds_per_ward):
         """Create users assigned to wards or beds."""

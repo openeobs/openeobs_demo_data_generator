@@ -8,8 +8,10 @@ class Field(object):
 
     def _create(self, record, attributes):
         if 'value' in attributes:
-            value = attributes['value']
+            value = str(attributes['value'])
             del attributes['value']
+        else:
+            value = None
 
         self._element = SubElement(record, 'field', attributes)
         self.value = value

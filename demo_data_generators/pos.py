@@ -20,7 +20,6 @@ class POSGenerator(object):
         self.data = SubElement(self.root, 'data')
 
         self.generate_pos()
-        self.generate_location_lots()
         self.generate_hospital()
 
     def generate_pos(self):
@@ -100,11 +99,3 @@ class POSGenerator(object):
 
         SubElement(record, 'field', {'name': 'company_id',
                                      'ref': 'base.main_company'})
-
-        SubElement(record, 'field',
-                   {'name': 'lot_admission_id',
-                    'ref': 'nhc_def_conf_location_lot_admission'})
-
-        SubElement(record, 'field',
-                   {'name': 'lot_discharge_id',
-                    'ref': 'nhc_def_conf_location_lot_discharge'})

@@ -20,7 +20,7 @@ class LocationsGenerator(object):
         self.data = SubElement(self.root, 'data', {'noupdate': '1'})
 
         self.generate_location(ward_name, 'Ward {0}'.format(ward_name.upper()),
-                               'ward', 'guh', ward_name, 0)
+                               'ward', False, ward_name, 0)
         self.generate_beds(beds_per_ward, ward_name)
 
     def generate_beds(self, number_of_beds, ward_name):
@@ -72,9 +72,15 @@ class LocationsGenerator(object):
         usage_field.text = usage
 
         # create a reference to parent location
-        SubElement(record, 'field', {
-            'name': 'parent_id',
-            'ref': 'nhc_def_conf_location_{0}'.format(parent)
+        if parent:
+            SubElement(record, 'field', {
+                'name': 'parent_id',
+                'ref': 'nhc_def_conf_location_{0}'.format(parent)
+            })
+        else:
+            SubElement(record, 'field', {
+                'name': 'parent_id',
+                'ref': 'nh_clinical.nhc_location_default_hospital'
             })
 
         # create a reference to context

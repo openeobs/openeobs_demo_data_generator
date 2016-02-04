@@ -1,9 +1,8 @@
 import psycopg2
 
 
-def refresh_materialized_views():
-    conn = psycopg2.connect(dbname='nhclinical', user='odoo',
-                            password='odoo')
+def refresh_materialized_views(database):
+    conn = psycopg2.connect(dbname=database, user='odoo', password='odoo')
     cursor = conn.cursor()
     cursor.execute("refresh materialized view ews0;")
     cursor.execute("refresh materialized view ews1;")
@@ -12,7 +11,3 @@ def refresh_materialized_views():
     cursor.execute("refresh materialized view param;")
     cursor.execute("refresh materialized view weight;")
     cursor.execute("refresh materialized view pbp;")
-
-
-
-

@@ -25,7 +25,7 @@ def main():
     server = args.server
     database = args.database
     DischargeTransferCoordinator(server, database, 'adt', 'adt')
-    refresh_materialized_views()
+    refresh_materialized_views(database)
 
 
 if __name__ == '__main__':

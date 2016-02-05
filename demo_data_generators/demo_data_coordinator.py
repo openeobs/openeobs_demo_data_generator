@@ -40,8 +40,8 @@ class DemoDataCoordinator(object):
         self.patient_id_regex = re.compile(patient_id_regex_string)
 
         point_of_service = POSGenerator()
-        self.indent(point_of_service.root)
-        users_tree = ElementTree(point_of_service.root)
+        self.indent(point_of_service.document)
+        users_tree = ElementTree(point_of_service.document)
         users_tree.write(os.path.join(data_folder, 'pos.xml'))
 
         users_generator = UsersGenerator(users_schema)

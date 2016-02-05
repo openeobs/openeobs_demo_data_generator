@@ -52,4 +52,3 @@ class UserNames(object):
 
     def __setitem__(self, key, value):
         self.__dict__[key] = value
-

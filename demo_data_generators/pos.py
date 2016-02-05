@@ -24,9 +24,10 @@ class POSGenerator(object):
 
     def generate_pos(self):
         """Create POS data as an XML tree."""
-        record = SubElement(self.data, 'record',
-                            {'model': 'nh.clinical.location',
-                             'id': 'nh_clinical.nhc_location_default_hospital'})
+        record = SubElement(
+            self.data, 'record',
+            {'model': 'nh.clinical.location',
+             'id': 'nh_clinical.nhc_location_default_hospital'})
         # Create name field
         name_field = SubElement(record, 'field', {'name': 'name'})
         name_field.text = 'Greenfield University Hospital'

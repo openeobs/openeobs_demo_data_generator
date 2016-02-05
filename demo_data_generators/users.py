@@ -45,6 +45,7 @@ class UsersGenerator(object):
         :type users_schema: dict (see the docstring for further details)
         """
         self.users_schema = users_schema
+        self.default_admin_used = False
 
         # Create root element
         self.class_root = Element('openerp')
@@ -133,10 +134,15 @@ class UsersGenerator(object):
         """
         first_name = next(first_name_generator)
         last_name = self.data_generator.last_name()
-        record = SubElement(xml_parent, 'record',
-                            {'model': 'res.users',
-                             'id': 'nhc_def_conf_{0}_{1}_user'.format(
-                                 role, first_name.lower())})
+        if role == 'admin' and not self.default_admin_used:
+            record = SubElement(xml_parent, 'record',
+                                {'model': 'res.users',
+                                 'id': 'nh_clinical.nhc_default_admin_user'})
+        else:
+            record = SubElement(xml_parent, 'record',
+                                {'model': 'res.users',
+                                 'id': 'nhc_def_conf_{0}_{1}_user'.format(
+                                     role, first_name.lower())})
         # Create user name field
         name_field = SubElement(record, 'field', {'name': 'name'})
         name_field.text = '{0} {1}'.format(first_name, last_name)
@@ -160,8 +166,12 @@ class UsersGenerator(object):
         SubElement(record, 'field',
                    {'name': 'location_ids', 'eval': locations})
         # Create pos field
-        SubElement(record, 'field',
-                   {'name': 'pos_id', 'ref': 'nhc_def_conf_pos_hospital'})
+        SubElement(
+            record, 'field',
+            {
+                'name': 'pos_ids',
+                'eval':
+                    "[[6,0,[ref('nh_clinical.nhc_location_default_pos')]]]"})
 
     def generate_adt_user(self):
         record = SubElement(self.class_data, 'record',
@@ -184,8 +194,12 @@ class UsersGenerator(object):
                    {'name': 'category_id',
                     'eval': "[(4, ref('nh_clinical.role_nhc_admin'))]"})
 
-        SubElement(record, 'field',
-                   {'name': 'pos_id', 'ref': 'nhc_def_conf_pos_hospital'})
+        SubElement(
+            record, 'field',
+            {
+                'name': 'pos_ids',
+                'eval':
+                    "[[6,0,[ref('nh_clinical.nhc_location_default_pos')]]]"})
 
     def generate_users_per_ward(self, ward, beds_per_ward):
         """Create users assigned to wards or beds."""

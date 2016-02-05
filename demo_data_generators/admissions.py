@@ -329,7 +329,7 @@ class AdmissionsGenerator(object):
             'field',
             {
                 'name': 'pos_id',
-                'ref': 'nhc_def_conf_pos_hospital'
+                'ref': 'nh_clinical.nhc_location_default_pos'
             }
         )
 
@@ -533,7 +533,7 @@ class AdmissionsGenerator(object):
             'field',
             {
                 'name': 'pos_id',
-                'ref': 'nhc_def_conf_pos_hospital'
+                'ref': 'nh_clinical.nhc_location_default_pos'
             }
         )
 

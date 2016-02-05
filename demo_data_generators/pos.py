@@ -20,17 +20,16 @@ class POSGenerator(object):
         self.data = SubElement(self.root, 'data')
 
         self.generate_pos()
-        self.generate_location_lots()
         self.generate_hospital()
 
     def generate_pos(self):
         """Create POS data as an XML tree."""
         record = SubElement(self.data, 'record',
                             {'model': 'nh.clinical.location',
-                             'id': 'nhc_def_conf_location_guh'})
+                             'id': 'nh_clinical.nhc_location_default_hospital'})
         # Create name field
         name_field = SubElement(record, 'field', {'name': 'name'})
-        name_field.text = 'GUH POS Location'
+        name_field.text = 'Greenfield University Hospital'
         # Create code field
         code_field = SubElement(record, 'field', {'name': 'code'})
         code_field.text = 'GUH'
@@ -60,8 +59,9 @@ class POSGenerator(object):
         usage_field = SubElement(record, 'field', {'name': 'usage'})
         usage_field.text = 'room'
 
-        SubElement(record, 'field', {'name': 'parent_id',
-                                     'ref': 'nhc_def_conf_location_guh'})
+        SubElement(record, 'field', {
+            'name': 'parent_id',
+            'ref': 'nh_clinical.nhc_location_default_hospital'})
 
         # Create Discharge Location lot
         record = SubElement(self.data, 'record',
@@ -80,28 +80,22 @@ class POSGenerator(object):
         usage_field = SubElement(record, 'field', {'name': 'usage'})
         usage_field.text = 'room'
 
-        SubElement(record, 'field', {'name': 'parent_id',
-                                     'ref': 'nhc_def_conf_location_guh'})
+        SubElement(record, 'field', {
+            'name': 'parent_id',
+            'ref': 'nh_clinical.nhc_location_default_hospital'})
 
     def generate_hospital(self):
         """Create Hospital data as an XML tree."""
         record = SubElement(self.data, 'record',
                             {'model': 'nh.clinical.pos',
-                             'id': 'nhc_def_conf_pos_hospital'})
+                             'id': 'nh_clinical.nhc_location_default_pos'})
 
         name_field = SubElement(record, 'field', {'name': 'name'})
         name_field.text = 'Greenfield University Hospital'
 
-        SubElement(record, 'field', {'name': 'location_id',
-                                     'ref': 'nhc_def_conf_location_guh'})
+        SubElement(record, 'field', {
+            'name': 'location_id',
+            'ref': 'nh_clinical.nhc_location_default_hospital'})
 
         SubElement(record, 'field', {'name': 'company_id',
                                      'ref': 'base.main_company'})
-
-        SubElement(record, 'field',
-                   {'name': 'lot_admission_id',
-                    'ref': 'nhc_def_conf_location_lot_admission'})
-
-        SubElement(record, 'field',
-                   {'name': 'lot_discharge_id',
-                    'ref': 'nhc_def_conf_location_lot_discharge'})

@@ -17,6 +17,8 @@ class TestDemoDataGeneratorFileStructure(fake_filesystem_unittest.TestCase):
     def setUp(self):
         def fake_init(self, *args, **kwargs):
             self.root = fromstring('<openerp></openerp>')
+            # for pos
+            self.document = fromstring('<openerp></openerp>')
             self.class_root = fromstring('<openerp></openerp>')
             self.data = fromstring('<data></data>')
             self.class_data = fromstring('<data></data>')

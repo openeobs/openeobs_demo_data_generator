@@ -26,14 +26,14 @@ ward_manager_first_names = (
     'Winifred', 'Walter', 'Whitney', 'William', 'Wes', 'Willow'
 )
 doctor_first_names = (
-    'Delores', 'Damien', 'Dale', 'Delilah', 'Don', 'Diego',
+    'Dolores', 'Damien', 'Dale', 'Delilah', 'Don', 'Diego',
     'Dawson', 'Dalek', 'Daniella', 'Dafyd', 'Davina', 'Dave',
     'Don', 'Delia', 'Denzel', 'Darius', 'Diana', 'Dana',
     'Dara', 'Dawn', 'Dominique', 'Dakota', 'Daphne', 'Debby'
 )
 senior_manager_first_names = ('Scotty', 'Spencer', 'Sophia')
 kiosk_first_names = ('Kevin', 'Kelly', 'Klara', 'Kane', 'Klaus')
-admin_first_names = ('Olga', 'Ollie')
+admin_first_names = ('Olga', 'Ollie', 'Otto', 'Olaf', 'Oscar')
 
 
 class UserNames(object):

@@ -87,9 +87,9 @@ class Record(object):
 
 class Document(object):
 
-    def __init__(self):
+    def __init__(self, update='1'):
         self.document = Element('openerp')
-        self.data = SubElement(self.document, 'data', {'noupdate': '1'})
+        self.data = SubElement(self.document, 'data', {'noupdate': update})
 
     def record(self, attributes):
         return Record(self.data, attributes)

@@ -12,179 +12,49 @@ class TestPOSGeneratorOutput(unittest.TestCase):
         Setup an example patients generator instance so can use the record
         """
         self.gen = POSGenerator()
-        records = self.gen.data.findall('record')
+        records = self.gen.data
+        self.pos_record = records[1]
         self.hospital_location_record = records[0]
-        self.admission_location_record = records[1]
-        self.discharge_location_record = records[2]
-        self.pos_record = records[3]
 
     def test_hospital_location_record(self):
         """
         Make sure the record has teh correct id and model
         """
         self.assertEqual(self.hospital_location_record.attrib['id'],
-                         'nhc_def_conf_location_guh',
-                         'Incorrect ID ')
+                         'nh_clinical.nhc_location_default_hospital')
         self.assertEqual(self.hospital_location_record.attrib['model'],
-                         'nh.clinical.location',
-                         'Incorrect model')
+                         'nh.clinical.location')
 
-    def test_hospital_location_name_field(self):
-        """
-        Make sure the name field is correct
-        """
-        field = self.hospital_location_record.find('field[@name=\'name\']')
-        self.assertEqual(field.text, 'GUH POS Location',
-                         'Incorrect name on location')
-        
-    def test_hospital_location_code_field(self):
-        """
-        Make sure the code field is correct
-        """
-        field = self.hospital_location_record.find('field[@name=\'code\']')
-        self.assertEqual(field.text, 'GUH',
-                         'Incorrect code on location')
-        
     def test_hospital_location_type_field(self):
         """
         Make sure the type field is correct
         """
         field = self.hospital_location_record.find('field[@name=\'type\']')
-        self.assertEqual(field.text, 'pos',
-                         'Incorrect type on location')
+        self.assertEqual(field.text, 'pos')
 
     def test_hospital_location_usage_field(self):
         """
         Make sure the usage field is correct
         """
         field = self.hospital_location_record.find('field[@name=\'usage\']')
-        self.assertEqual(field.text, 'hospital',
-                         'Incorrect usage on location')
-        
-    def test_admission_location_record(self):
-        """
-        Make sure the record has teh correct id and model
-        """
-        self.assertEqual(self.admission_location_record.attrib['id'],
-                         'nhc_def_conf_location_lot_admission',
-                         'Incorrect ID ')
-        self.assertEqual(self.admission_location_record.attrib['model'],
-                         'nh.clinical.location',
-                         'Incorrect model')
-
-    def test_admission_location_name_field(self):
-        """
-        Make sure the name field is correct
-        """
-        field = self.admission_location_record.find('field[@name=\'name\']')
-        self.assertEqual(field.text, 'Admission Location',
-                         'Incorrect name on location')
-        
-    def test_admission_location_code_field(self):
-        """
-        Make sure the code field is correct
-        """
-        field = self.admission_location_record.find('field[@name=\'code\']')
-        self.assertEqual(field.text, 'ADML-GUH',
-                         'Incorrect code on location')
-        
-    def test_admission_location_type_field(self):
-        """
-        Make sure the type field is correct
-        """
-        field = self.admission_location_record.find('field[@name=\'type\']')
-        self.assertEqual(field.text, 'structural',
-                         'Incorrect type on location')
-
-    def test_admission_location_usage_field(self):
-        """
-        Make sure the usage field is correct
-        """
-        field = self.admission_location_record.find('field[@name=\'usage\']')
-        self.assertEqual(field.text, 'room',
-                         'Incorrect usage on location')
-        
-    def test_admission_location_parent_field(self):
-        """
-        Make sure the parent field is correct
-        """
-        field = \
-            self.admission_location_record.find('field[@name=\'parent_id\']')
-        self.assertEqual(field.attrib['ref'],
-                         'nhc_def_conf_location_guh',
-                         'Incorrect parent id')
-
-    def test_discharge_location_record(self):
-        """
-        Make sure the record has teh correct id and model
-        """
-        self.assertEqual(self.discharge_location_record.attrib['id'],
-                         'nhc_def_conf_location_lot_discharge',
-                         'Incorrect ID ')
-        self.assertEqual(self.discharge_location_record.attrib['model'],
-                         'nh.clinical.location',
-                         'Incorrect model')
-
-    def test_discharge_location_name_field(self):
-        """
-        Make sure the name field is correct
-        """
-        field = self.discharge_location_record.find('field[@name=\'name\']')
-        self.assertEqual(field.text, 'Discharge Location',
-                         'Incorrect name on location')
-        
-    def test_discharge_location_code_field(self):
-        """
-        Make sure the code field is correct
-        """
-        field = self.discharge_location_record.find('field[@name=\'code\']')
-        self.assertEqual(field.text, 'DISL-GUH',
-                         'Incorrect code on location')
-        
-    def test_discharge_location_type_field(self):
-        """
-        Make sure the type field is correct
-        """
-        field = self.discharge_location_record.find('field[@name=\'type\']')
-        self.assertEqual(field.text, 'structural',
-                         'Incorrect type on location')
-
-    def test_discharge_location_usage_field(self):
-        """
-        Make sure the usage field is correct
-        """
-        field = self.discharge_location_record.find('field[@name=\'usage\']')
-        self.assertEqual(field.text, 'room',
-                         'Incorrect usage on location')
-        
-    def test_discharge_location_parent_field(self):
-        """
-        Make sure the parent field is correct
-        """
-        field = \
-            self.discharge_location_record.find('field[@name=\'parent_id\']')
-        self.assertEqual(field.attrib['ref'],
-                         'nhc_def_conf_location_guh',
-                         'Incorrect parent id')
+        self.assertEqual(field.text, 'hospital')
 
     def test_pos_record(self):
         """
         Make sure the record has teh correct id and model
         """
-        self.assertEqual(self.pos_record.attrib['id'],
-                         'nhc_def_conf_pos_hospital',
-                         'Incorrect ID ')
-        self.assertEqual(self.pos_record.attrib['model'],
-                         'nh.clinical.pos',
-                         'Incorrect model')
+        self.assertEqual(
+            self.pos_record.attrib['id'],
+            'nh_clinical.nhc_location_default_pos')
+        self.assertEqual(
+            self.pos_record.attrib['model'], 'nh.clinical.pos')
 
     def test_pos_record_name_field(self):
         """
         Make sure the name field is correct
         """
         field = self.pos_record.find('field[@name=\'name\']')
-        self.assertEqual(field.text, 'Greenfield University Hospital',
-                         'Incorrect name on location')
+        self.assertEqual(field.text, 'Greenfield University Hospital')
 
     def test_pos_record_location_field(self):
         """
@@ -192,34 +62,12 @@ class TestPOSGeneratorOutput(unittest.TestCase):
         """
         field = self.pos_record.find('field[@name=\'location_id\']')
         self.assertEqual(field.attrib['ref'],
-                         'nhc_def_conf_location_guh',
-                         'Incorrect location id')
+                         'nh_clinical.nhc_location_default_hospital')
 
     def test_pos_record_company_field(self):
         """
         Make sure the company field is correct
         """
         field = self.pos_record.find('field[@name=\'company_id\']')
-        self.assertEqual(field.attrib['ref'],
-                         'base.main_company',
-                         'Incorrect company id')
+        self.assertEqual(field.attrib['ref'], 'base.main_company')
 
-    def test_pos_record_lot_admission_field(self):
-        """
-        Make sure the lot admission id field is correct
-        """
-        field = \
-            self.pos_record.find('field[@name=\'lot_admission_id\']')
-        self.assertEqual(field.attrib['ref'],
-                         'nhc_def_conf_location_lot_admission',
-                         'Incorrect lot admission id')
-
-    def test_pos_record_lot_discharge_field(self):
-        """
-        Make sure the lot discharge id field is correct
-        """
-        field = \
-            self.pos_record.find('field[@name=\'lot_discharge_id\']')
-        self.assertEqual(field.attrib['ref'],
-                         'nhc_def_conf_location_lot_discharge',
-                         'Incorrect lot discharge id')

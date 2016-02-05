@@ -32,20 +32,24 @@ doctor_first_names = (
     'Dara', 'Dawn', 'Dominique', 'Dakota', 'Daphne', 'Debby'
 )
 senior_manager_first_names = ('Scotty', 'Spencer', 'Sophia')
-kiosk_first_names = ('Kevin', 'Kelly', 'Klara', 'Kane', 'Klaus' )
+kiosk_first_names = ('Kevin', 'Kelly', 'Klara', 'Kane', 'Klaus')
 admin_first_names = ('Olga', 'Ollie')
 
 
 class UserNames(object):
 
     def __init__(self):
-        self.hca = hca_first_names
-        self.nurse = nurse_first_names
-        self.ward_manager = ward_manager_first_names
-        self.senior_manager = senior_manager_first_names
-        self.doctor = doctor_first_names
-        self.kiosk = kiosk_first_names
-        self.admin = admin_first_names
+        self.hca = (name for name in hca_first_names)
+        self.nurse = (name for name in nurse_first_names)
+        self.ward_manager = (name for name in ward_manager_first_names)
+        self.senior_manager = (name for name in senior_manager_first_names)
+        self.doctor = (name for name in doctor_first_names)
+        self.kiosk = (name for name in kiosk_first_names)
+        self.admin = (name for name in admin_first_names)
 
     def __getitem__(self, item):
         return self.__dict__[item]
+
+    def __setitem__(self, key, value):
+        self.__dict__[key] = value
+

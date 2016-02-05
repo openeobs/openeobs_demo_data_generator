@@ -96,7 +96,7 @@ class TestUsersGeneratorMultiWardOutput(unittest.TestCase):
         """
         Make sure the pos field is correct
         """
-        field = self.record.find('field[@name=\'pos_id\']')
-        self.assertEqual(field.attrib['ref'],
-                         'nhc_def_conf_pos_hospital',
-                         'Incorrect eval on pos id')
+        field = self.record.find('field[@name=\'pos_ids\']')
+        self.assertEqual(
+            field.attrib['eval'],
+            "[[6,0,[ref('nh_clinical.nhc_location_default_pos')]]]")

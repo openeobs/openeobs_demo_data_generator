@@ -4,9 +4,10 @@
 """
 Generate users, based on locations created and wards assignment schema.
 """
-from faker import Factory
-from faker.providers.person.en import Provider
 from xml.etree.ElementTree import Element, SubElement, Comment
+
+from faker import Factory
+from user_names import UserNames
 
 
 class UsersGenerator(object):
@@ -91,22 +92,7 @@ class UsersGenerator(object):
         # First name generators, once per role.
         # Each of them returns only names starting by the initial letter
         # of the role denomination.
-        self.names_generators = {
-            'hca': (n for n in Provider.first_names
-                    if n.lower().startswith('h')),
-            'nurse': (n for n in Provider.first_names
-                      if n.lower().startswith('n')),
-            'ward_manager': (n for n in Provider.first_names
-                             if n.lower().startswith('w')),
-            'senior_manager': (n for n in Provider.first_names
-                               if n.lower().startswith('s')),
-            'doctor': (n for n in Provider.first_names
-                       if n.lower().startswith('d')),
-            'kiosk': (n for n in Provider.first_names
-                      if n.lower().startswith('k')),
-            'admin': (n for n in Provider.first_names
-                      if n.lower().startswith('o'))
-        }
+        self.names_generators = UserNames()
 
     def get_beds_number_generator(self, beds_number):
         """Simple number generator."""
@@ -217,7 +203,7 @@ class UsersGenerator(object):
                 category_id = "[(4, ref('nh_clinical.{0}'))]".format(
                     self.categories[role])
 
-                first_name_generator = self.names_generators.get(role)
+                first_name_generator = self.names_generators[role]
 
                 beds_per_user = beds_per_ward / users_per_ward
 
@@ -267,7 +253,7 @@ class UsersGenerator(object):
                     self.groups[role])
                 category_id = "[(4, ref('nh_clinical.{0}'))]".format(
                     self.categories[role])
-                first_name_generator = self.names_generators.get(role)
+                first_name_generator = self.names_generators[role]
                 location_ids = "[[6, False, []]]"
 
                 # Add a comment to divide XML in sections by role
@@ -294,7 +280,7 @@ class UsersGenerator(object):
                 category_id = "[(4, ref('nh_clinical.{0}'))]".format(
                     self.categories[role])
 
-                first_name_generator = self.names_generators.get(role)
+                first_name_generator = self.names_generators[role]
 
                 # Add a comment to divide XML in sections by role
                 users_role_comment = Comment(' {0} '.format(role))

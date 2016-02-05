@@ -100,8 +100,8 @@ class TestLocationsGeneratorOutput(unittest.TestCase):
         Make sure the parent id is correct
         """
         field = self.ward_record.find('field[@name=\'parent_id\']')
-        self.assertEqual(field.attrib['ref'], 'nhc_def_conf_location_guh',
-                         'Incorrect parent id defined')
+        self.assertEqual(field.attrib['ref'],
+                         'nh_clinical.nhc_location_default_hospital')
 
     def test_bed_parent_id(self):
         """

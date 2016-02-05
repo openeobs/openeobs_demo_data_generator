@@ -132,8 +132,8 @@ class TestAdmissionsGeneratorAdmitOutput(unittest.TestCase):
         Make sure the pos_id field for the  is correct
         """
         field = self.model_record.find('field[@name=\'pos_id\']')
-        self.assertEqual(field.attrib['ref'], 'nhc_def_conf_pos_hospital',
-                         'Incorrect pos_id on activity')
+        self.assertEqual(field.attrib['ref'],
+                         'nh_clinical.nhc_location_default_pos')
     
     def test_code_field(self):
         """

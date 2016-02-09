@@ -8,6 +8,8 @@ install:
 script:
 - nosetests tests/ --with-coverage
 - flake8 demo_data_generators
+- flake8 analysis_tools
 # Run analysis on code base
 after_script:
 - pylint demo_data_generators
+- pyline analysis_tools

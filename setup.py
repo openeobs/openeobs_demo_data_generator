@@ -14,7 +14,8 @@ setup(
         'demo_setup_tools',
         'smoketest',
         'security',
-        'demo_refresh_tools'],
+        'demo_refresh_tools',
+        'analysis_tools'],
     include_package_data=True,
     entry_points={
         "console_scripts": [
@@ -22,7 +23,8 @@ setup(
             "run_smoke_tests = smoketest.__main__:main",
             "setup_openeobs_demo = demo_setup_tools.__main__:main",
             "change_odoo_admin_password = security.__main__:main",
-            "refresh_openeobs_demo = demo_refresh_tools.__main__:main"
+            "refresh_openeobs_demo = demo_refresh_tools.__main__:main",
+            "analyze_users = analysis_tools.__main__:main"
         ]
     },
     install_requires=[

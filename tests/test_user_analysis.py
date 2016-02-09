@@ -1,6 +1,6 @@
 import unittest
 from mock import MagicMock, Mock
-from analysis_tools.user import User
+from analysis_tools.user_analysis import User
 
 class TestUserBuilder(unittest.TestCase):
     """

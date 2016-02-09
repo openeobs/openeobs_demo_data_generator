@@ -8,7 +8,7 @@ install:
 script:
 - nosetests tests/ --with-coverage
 - flake8 demo_data_generators
-- nosetests analysis_tools/tests --with-coverage
+- nosetests analysis_tools/tests/ --with-coverage
 - flake8 analysis_tools
 # Run analysis on code base
 after_script:

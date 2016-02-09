@@ -29,7 +29,7 @@ class TestUserCSVWriter(TestCase):
     def test_column_names_returns_list_of_column_names(self):
         self.assertEqual(column_names(), self.field_names)
 
-    def test_add_columns_names(self):
+    def test_add_column_names_prepends_column_names_to_list_of_users(self):
         users = list(self.users)
 
         add_column_names(users)
@@ -39,7 +39,7 @@ class TestUserCSVWriter(TestCase):
         self.assertEqual(users[1], self.users[0])
         self.assertEqual(users[2], self.users[1])
 
-    def test_create_user_csv(self):
+    def test_create_user_csv_creates_a_csv_file(self):
         create_user_csv('test.csv', self.users)
         with open('test.csv', 'rb') as f:
             reader = csv.DictReader(f)

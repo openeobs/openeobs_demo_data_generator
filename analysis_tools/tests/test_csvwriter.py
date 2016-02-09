@@ -2,7 +2,8 @@ import os
 import csv
 from unittest import TestCase
 
-from analysis_tools.csvwriter import UserCSVWriter
+from analysis_tools.csvwriter import column_names, add_column_names, \
+    create_user_csv
 
 
 class TestUserCSVWriter(TestCase):
@@ -12,12 +13,34 @@ class TestUserCSVWriter(TestCase):
             [1, 'nora', 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1],
             [2, 'waino', 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         ]
+        self.field_names = [
+            'user_id', 'username', 'System Administrator', 'Kiosk',
+            'Senior Manager', 'Receptionist', 'Doctor', 'Senior Doctor',
+            'Junior Doctor', 'Registrar', 'Consultant', 'Ward Manager',
+            'Nurse', 'HCA'
+        ]
 
     def tearDown(self):
-        os.remove('test.csv')
+        try:
+            os.remove('test.csv')
+        except OSError:
+            pass
 
-    def test_UserCSVWriter_writes_to_file(self):
-        UserCSVWriter('test.csv', self.users)
+    def test_column_names_returns_list_of_column_names(self):
+        self.assertEqual(column_names(), self.field_names)
+
+    def test_add_columns_names(self):
+        users = list(self.users)
+
+        add_column_names(users)
+
+        self.assertNotEqual(users, self.users)
+        self.assertEqual(users[0], self.field_names)
+        self.assertEqual(users[1], self.users[0])
+        self.assertEqual(users[2], self.users[1])
+
+    def test_create_user_csv(self):
+        create_user_csv('test.csv', self.users)
         with open('test.csv', 'rb') as f:
             reader = csv.DictReader(f)
             row = reader.next()

@@ -1,0 +1,40 @@
+doctor:
+  unassigned: 4,
+  total: 24,
+  per_ward: 4
+
+admin:
+  unassigned: 0,
+  total: 1,
+  per_ward: 0,
+  multi_wards: all
+
+kiosk:
+  unassigned: 0,
+  total: 5,
+  per_ward: 1
+
+senior_manager:
+  unassigned: 0,
+  total: 3,
+  per_ward: 0,
+  multi_wards: [
+    [a, b, c],
+    [d, e],
+    [a, b, c, d, e]
+  ]
+
+hca:
+  unassigned: 5,
+  total: 55,
+  per_ward: 10
+
+nurse:
+  unassigned: 5,
+  total: 55,
+  per_ward: 10
+
+ward_manager:
+  unassigned: 1,
+  total: 6,
+  per_ward: 1

@@ -65,7 +65,7 @@ class TestLocationsGeneratorOutput(unittest.TestCase):
         Make sure that the code field is correct
         """
         field = self.bed_record.find('field[@name=\'code\']')
-        self.assertEqual(field.text, 'A1', 'Code field incorrect')
+        self.assertEqual(field.text, 'A001', 'Code field incorrect')
 
     def test_ward_type(self):
         """

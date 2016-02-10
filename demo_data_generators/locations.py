@@ -3,6 +3,7 @@
 """
 Generate Ward and defined number of beds
 """
+from string import zfill
 from xml.etree.ElementTree import Element, SubElement
 
 
@@ -59,6 +60,7 @@ class LocationsGenerator(object):
         if usage == 'ward':
             code_field.text = ward.upper()
         elif usage == 'bed':
+            bed_number = zfill(bed_number, 3)
             code_field.text = '{0}{1}'.format(ward.upper(), bed_number)
         else:
             code_field.text = rid.upper().replace('_', '')

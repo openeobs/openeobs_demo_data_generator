@@ -59,13 +59,13 @@ class SmokeTestProduction(unittest.TestCase):
     def test_admit_patient(self):
         self.patient.location = 'A1'
         self.patient.start_date = '01-06-2016'
-        result = self.admit_patient(self.patient, self.api)
+        result = self.admit_patient()
         self.assertTrue(result, "Patient was not admitted")
 
     def test_transfer_patient(self):
         self.patient.location = 'A2'
         self.patient.start_date = '01-06-2016'
-        self.admit_patient(self.patient, self.api)
+        self.assertTrue(self.admit_patient())
 
         self.patient.location = 'A22'
         result = self.api.transfer(self.patient.hospitalnumber, self.patient.__dict__)
@@ -74,14 +74,14 @@ class SmokeTestProduction(unittest.TestCase):
     def test_discharge_patient(self):
         self.patient.location = 'A3'
         self.patient.start_date = '01-06-2016'
-        self.admit_patient(self.patient, self.api)
+        self.assertTrue(self.admit_patient())
 
         self.patient.POS = 'NW12'
         result = self.api.discharge(self.patient.hospitalnumber, self.patient.__dict__)
         self.assertTrue(result, "Patient wasn't discharged")
 
-    def admit_patient(self, patient, api):
-        return api.admit(patient.hospitalnumber, patient.__dict__)
+    def admit_patient(self):
+        return self.api.admit(self.patient.hospitalnumber, self.patient.__dict__)
 
     #def test_nhs_number_needed(self):
         #self.patient.patient_identifier = ""

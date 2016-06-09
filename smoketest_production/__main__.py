@@ -9,7 +9,7 @@ PARSER.add_argument('database', type=str,
                     default='nhclinical')
 PARSER.add_argument('--server', type=str,
                     help='Server to run tests against',
-                    default='http://54.171.180.53')
+                    default='http://localhost')
 PARSER.add_argument('--user', type=str,
                     help='User to run tests as',
                     default='admin')
@@ -21,8 +21,10 @@ def main():
     args = PARSER.parse_args()
     SmokeTestProduction.SERVER = args.server
     SmokeTestProduction.DATABASE = args.database
-    SmokeTestProduction.USER = 'admin'
-    SmokeTestProduction.PASSWORD = 'admin'
+    SmokeTestProduction.ADMIN_USER = 'admin'
+    SmokeTestProduction.ADMIN_PASSWORD = 'admin'
+    SmokeTestProduction.ADT_USER = 'adt'
+    SmokeTestProduction.ADT_PASSWORD = 'adt'
 
     suite = unittest.TestLoader().loadTestsFromTestCase(SmokeTestProduction)
     unittest.TextTestRunner(verbosity=2).run(suite)

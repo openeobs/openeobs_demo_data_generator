@@ -93,21 +93,21 @@ class SmokeTestProduction(unittest.TestCase):
 
     def test_log_files_exist_and_are_not_empty(self):
         log_file = "/var/log/odoo/odoo_server.log"
-        self.assertTrue(os.path.exists(log_file))
+        self.assertTrue(os.path.exists(log_file), log_file + " doesn't exist")
 
-        self.assertTrue(os.path.getsize(log_file) > 0)
+        self.assertTrue(os.path.getsize(log_file) > 0, log_file + " is empty")
 
     def test_bcp_directory_exists_and_has_right_permissions(self):
         backup_path = "/bcp"
-        self.assertTrue(os.path.exists(backup_path))
-        self.assertTrue(pwd.getpwuid(os.stat(backup_path).st_uid).pw_name == "odoo")
+        self.assertTrue(os.path.exists(backup_path), backup_path + " doesn't exist")
+        self.assertTrue(pwd.getpwuid(os.stat(backup_path).st_uid).pw_name == "odoo", backup_path + " owner is not 'odoo'")
 
     def test_check_odoo_backup_cronjob_is_present(self):
         model = self.c.model('ir.cron')
         record = model.browse([])
         cronjob_list = model.read(record._idnames)
 
-        self.assertTrue(d['function'] == 'print_report' for d in cronjob_list)
+        self.assertTrue((d['function'] == 'print_report' for d in cronjob_list), "print_report cronjob not installed")
 
     def admit_patient(self):
         return self.api.admit(self.patient.hospitalnumber, self.patient.__dict__)

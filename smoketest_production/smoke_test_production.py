@@ -3,6 +3,8 @@ import unittest
 import random
 import string
 import os
+#from pwd import getpwuid
+import pwd
 from patient import DummyPatient
 
 
@@ -32,6 +34,7 @@ class SmokeTestProduction(unittest.TestCase):
         self.a = self.c.model('nh.activity')
         self.s = self.c.model('nh.clinical.spell')
         self.l = self.c.model('nh.clinical.location')
+        self.u = self.c.model('res.users')
         self.api = self.c.model('nh.eobs.api')
 
         # Set up a new patient for each test
@@ -45,12 +48,6 @@ class SmokeTestProduction(unittest.TestCase):
     def tearDownClass(cls):
         pass
         cls.client.db.drop(cls.ADMIN_USER, cls.TEST_DATABASE)
-
-    def test_port_8069_is_accessible(self):
-        pass
-
-    def test_port_5432_is_accessible(self):
-        pass
 
     def test_register_patient(self):
         result = self.api.register(self.patient.hospitalnumber, self.patient.__dict__)
@@ -80,10 +77,37 @@ class SmokeTestProduction(unittest.TestCase):
         result = self.api.discharge(self.patient.hospitalnumber, self.patient.__dict__)
         self.assertTrue(result, "Patient wasn't discharged")
 
+    def test_create_location(self):
+        result = self.l.create({'usage': 'bed', 'type': 'pos', 'name': 'SmokeTest bed'})
+        self.assertTrue(result.id > 0)
+
+    def test_create_user(self):
+        result = self.u.create({'name': 'Nurse 1', 'login': 'nurse_01', 'password': 'user_000'})
+        self.assertTrue(result.id > 0)
+
+    def test_check_installed_modules(self):
+        modules = self.c.modules(installed=True)
+        self.assertIn('nh_eobs_adt_gui', modules)
+        self.assertIn('nh_eobs_slam', modules)
+        self.assertIn('nh_eobs_backup', modules)
+
+    def test_log_files_exist_and_are_not_empty(self):
+        log_file = "/var/log/odoo/odoo_server.log"
+        self.assertTrue(os.path.exists(log_file))
+
+        self.assertTrue(os.path.getsize(log_file) > 0)
+
+    def test_bcp_directory_exists_and_has_right_permissions(self):
+        backup_path = "/bcp"
+        self.assertTrue(os.path.exists(backup_path))
+        self.assertTrue(pwd.getpwuid(os.stat(backup_path).st_uid).pw_name == "odoo")
+
+    def test_check_odoo_backup_cronjob_is_present(self):
+        model = self.c.model('ir.cron')
+        record = model.browse([])
+        cronjob_list = model.read(record._idnames)
+
+        self.assertTrue(d['function'] == 'print_report' for d in cronjob_list)
+
     def admit_patient(self):
         return self.api.admit(self.patient.hospitalnumber, self.patient.__dict__)
-
-    #def test_nhs_number_needed(self):
-        #self.patient.patient_identifier = ""
-    #    self.assertFalse(self.api.register(self.patient.hospitalnumber, self.patient.__dict__),
-    #                     "Patient was registered without NHS number")

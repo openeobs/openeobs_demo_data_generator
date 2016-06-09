@@ -85,11 +85,17 @@ class SmokeTestProduction(unittest.TestCase):
         result = self.u.create({'name': 'Nurse 1', 'login': 'nurse_01', 'password': 'user_000'})
         self.assertTrue(result.id > 0)
 
-    def test_check_installed_modules(self):
+    def test_nh_eobs_adt_gui_is_installed(self):
         modules = self.c.modules(installed=True)
-        self.assertIn('nh_eobs_adt_gui', modules)
-        self.assertIn('nh_eobs_slam', modules)
-        self.assertIn('nh_eobs_backup', modules)
+        self.assertIn('nh_eobs_adt_gui', modules.get('installed'))
+
+    def test_nh_eobs_slam_is_installed(self):
+        modules = self.c.modules(installed=True)
+        self.assertIn('nh_eobs_slam', modules.get('installed'))
+
+    def test_nh_eobs_backup_is_installed(self):
+        modules = self.c.modules(installed=True)
+        self.assertIn('nh_eobs_backup', modules.get('installed'))
 
     def test_log_files_exist_and_are_not_empty(self):
         log_file = "/var/log/odoo/odoo_server.log"

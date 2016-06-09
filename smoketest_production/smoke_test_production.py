@@ -49,17 +49,17 @@ class SmokeTestProduction(unittest.TestCase):
         pass
         cls.client.db.drop(cls.ADMIN_USER, cls.TEST_DATABASE)
 
-    def test_register_patient(self):
+    def test_adt_register_patient(self):
         result = self.api.register(self.patient.hospitalnumber, self.patient.__dict__)
         self.assertTrue(result, "Patient was not registered")
 
-    def test_admit_patient(self):
+    def test_adt_admit_patient(self):
         self.patient.location = 'A1'
         self.patient.start_date = '01-06-2016'
         result = self.admit_patient()
         self.assertTrue(result, "Patient was not admitted")
 
-    def test_transfer_patient(self):
+    def test_adt_transfer_patient(self):
         self.patient.location = 'A2'
         self.patient.start_date = '01-06-2016'
         self.assertTrue(self.admit_patient())
@@ -68,7 +68,7 @@ class SmokeTestProduction(unittest.TestCase):
         result = self.api.transfer(self.patient.hospitalnumber, self.patient.__dict__)
         self.assertTrue(result, "Patient was not transferred")
 
-    def test_discharge_patient(self):
+    def test_adt_discharge_patient(self):
         self.patient.location = 'A3'
         self.patient.start_date = '01-06-2016'
         self.assertTrue(self.admit_patient())
@@ -85,15 +85,15 @@ class SmokeTestProduction(unittest.TestCase):
         result = self.u.create({'name': 'Nurse 1', 'login': 'nurse_01', 'password': 'user_000'})
         self.assertTrue(result.id > 0)
 
-    def test_nh_eobs_adt_gui_is_installed(self):
+    def test_module_nh_eobs_adt_gui_is_installed(self):
         modules = self.c.modules(installed=True)
         self.assertIn('nh_eobs_adt_gui', modules.get('installed'))
 
-    def test_nh_eobs_slam_is_installed(self):
+    def test_module_nh_eobs_slam_is_installed(self):
         modules = self.c.modules(installed=True)
         self.assertIn('nh_eobs_slam', modules.get('installed'))
 
-    def test_nh_eobs_backup_is_installed(self):
+    def test_module_nh_eobs_backup_is_installed(self):
         modules = self.c.modules(installed=True)
         self.assertIn('nh_eobs_backup', modules.get('installed'))
 
@@ -108,7 +108,7 @@ class SmokeTestProduction(unittest.TestCase):
         self.assertTrue(os.path.exists(backup_path), backup_path + " doesn't exist")
         self.assertTrue(pwd.getpwuid(os.stat(backup_path).st_uid).pw_name == "odoo", backup_path + " owner is not 'odoo'")
 
-    def test_check_odoo_backup_cronjob_is_present(self):
+    def test_odoo_backup_cronjob_is_present(self):
         model = self.c.model('ir.cron')
         record = model.browse([])
         cronjob_list = model.read(record._idnames)

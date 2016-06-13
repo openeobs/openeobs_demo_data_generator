@@ -13,9 +13,9 @@ class SmokeTestProduction(unittest.TestCase):
     DATABASE = 'nhclinical'
     TEST_DATABASE = 'nhclinical_duplicate'
     ADMIN_USER = 'admin'
-    ADMIN_PASSWORD = os.environ['ADMIN_PASSWORD']
+    ADMIN_PASSWORD = None
     ADT_USER = 'adt'
-    ADT_PASSWORD = os.environ['ADT_PASSWORD']
+    ADT_PASSWORD = None
 
     @classmethod
     def setUpClass(cls):

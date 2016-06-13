@@ -3,20 +3,20 @@ import unittest
 import random
 import string
 import os
-#from pwd import getpwuid
 import pwd
 from patient import DummyPatient
 
 
 class SmokeTestProduction(unittest.TestCase):
 
-    SERVER = os.environ['SERVER']
-    DATABASE = 'nhclinical'
-    TEST_DATABASE = 'nhclinical_duplicate'
-    ADMIN_USER = 'admin'
-    ADMIN_PASSWORD = os.environ['ADMIN_PASSWORD']
-    ADT_USER = 'adt'
-    ADT_PASSWORD = os.environ['ADT_PASSWORD']
+
+#    SERVER = os.environ['SERVER']
+#    DATABASE = 'nhclinical'
+#    TEST_DATABASE = 'nhclinical_duplicate'
+#    ADMIN_USER = 'admin'
+#    ADMIN_PASSWORD = os.environ['ADMIN_PASSWORD']
+#    ADT_USER = 'adt'
+#    ADT_PASSWORD = os.environ['ADT_PASSWORD']
 
     @classmethod
     def setUpClass(cls):

@@ -4,18 +4,12 @@ import argparse
 from smoke_test_production import SmokeTestProduction
 
 PARSER = argparse.ArgumentParser('Production smoke tests')
-PARSER.add_argument('database', type=str,
-                    help='Database to run tests against',
-                    default='nhclinical')
-PARSER.add_argument('--server', type=str,
-                    help='Server to run tests against',
-                    default='http://localhost')
-PARSER.add_argument('--user', type=str,
-                    help='User to run tests as',
-                    default='admin')
-PARSER.add_argument('--password', type=str,
-                    help='Password for testing user', default='admin')
-
+PARSER.add_argument('database', type=str, help='Database to run tests against', default='nhclinical')
+PARSER.add_argument('--server', type=str, help='Server to run tests against', default='http://localhost:8069')
+PARSER.add_argument('--admin-user', type=str, help='Admin username', default='admin')
+PARSER.add_argument('--admin-pw', type=str, help='Admin user password')
+PARSER.add_argument('--adt-user', type=str, help='ADT username', default='adt')
+PARSER.add_argument('--adt-pw', type=str, help='ADT user password')
 
 def main():
     args = PARSER.parse_args()

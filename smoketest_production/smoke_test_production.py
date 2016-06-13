@@ -9,14 +9,13 @@ from patient import DummyPatient
 
 class SmokeTestProduction(unittest.TestCase):
 
-
-#    SERVER = os.environ['SERVER']
-#    DATABASE = 'nhclinical'
-#    TEST_DATABASE = 'nhclinical_duplicate'
-#    ADMIN_USER = 'admin'
-#    ADMIN_PASSWORD = os.environ['ADMIN_PASSWORD']
-#    ADT_USER = 'adt'
-#    ADT_PASSWORD = os.environ['ADT_PASSWORD']
+    SERVER = 'http://localhost:8069'
+    DATABASE = 'nhclinical'
+    TEST_DATABASE = 'nhclinical_duplicate'
+    ADMIN_USER = 'admin'
+    ADMIN_PASSWORD = os.environ['ADMIN_PASSWORD']
+    ADT_USER = 'adt'
+    ADT_PASSWORD = os.environ['ADT_PASSWORD']
 
     @classmethod
     def setUpClass(cls):

@@ -24,15 +24,20 @@ def main():
     adt_password = args.adtpw
     test_database = 'nhclinical_duplicate'
 
-    client = erppeek.Client(server=server, db=db, user=admin_user, password=admin_password)
+    print server
+    print db
+    print admin_user
+    print admin_password
 
-    if client.db.db_exist(test_database):
-        client.db.drop(admin_user, test_database)
+    #client = erppeek.Client(server=server, db=db, user=admin_user, password=admin_password)
 
-    client.db.duplicate_database(admin_user, db, test_database)
+    #if client.db.db_exist(test_database):
+    #    client.db.drop(admin_user, test_database)
+    #
+    #client.db.duplicate_database(admin_user, db, test_database)
 
     suite = unittest.TestSuite()
-    suite.addTest(ParametrizedTest.parametrize(ADT, server=server, adminpw=admin_password, adtpw=adt_password))
+    suite.addTest(ParametrizedTest.parametrize(ADT, server=server))
 
     unittest.TextTestRunner(verbosity=2).run(suite)
 

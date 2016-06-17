@@ -3,7 +3,7 @@ import unittest
 import argparse
 import erppeek
 from smoke_test_production import ParametrizedTest
-from smoke_test_production import ADT
+from smoke_test_production import ADT, EObsUser, Modules, BackupModule
 
 PARSER = argparse.ArgumentParser('Production smoke tests')
 PARSER.add_argument('database', type=str, help='Database to run tests against', default='nhclinical')
@@ -24,22 +24,27 @@ def main():
     adt_password = args.adtpw
     test_database = 'nhclinical_duplicate'
 
-    print server
-    print db
-    print admin_user
-    print admin_password
+    print "Creating duplicate database of ", db, "..."
 
-    #client = erppeek.Client(server=server, db=db, user=admin_user, password=admin_password)
+    client = erppeek.Client(server=server, db=db, user=admin_user, password=admin_password)
 
-    #if client.db.db_exist(test_database):
-    #    client.db.drop(admin_user, test_database)
-    #
-    #client.db.duplicate_database(admin_user, db, test_database)
+    if client.db.db_exist(test_database):
+        client.db.drop(admin_user, test_database)
+
+    client.db.duplicate_database(admin_user, db, test_database)
+
+    duplicate_client = erppeek.Client(server=server, db=test_database, user=adt_user, password=adt_password)
 
     suite = unittest.TestSuite()
-    suite.addTest(ParametrizedTest.parametrize(ADT, server=server))
+    suite.addTest(ParametrizedTest.parametrize(ADT, client=duplicate_client))
+    suite.addTest(ParametrizedTest.parametrize(EObsUser, client=duplicate_client))
+    suite.addTest(ParametrizedTest.parametrize(Modules, client=duplicate_client))
+    suite.addTest(ParametrizedTest.parametrize(BackupModule, client=duplicate_client))
 
     unittest.TextTestRunner(verbosity=2).run(suite)
+
+    client.db.drop(admin_user, test_database)
+
 
 if __name__ == "__main__":
     sys.exit(main())
